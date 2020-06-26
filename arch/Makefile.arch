@@ -1,0 +1,26 @@
+# guess hostname with hostname command, stripping off all trailing numbers
+HOSTNAME := $(shell hostname -s | sed  's/[0-9]*$$//g')
+ifeq ($(HOSTNAME),lassen)  
+  ARCHGUESS = sierra
+endif
+ifeq ($(HOSTNAME),blackcomb)
+  ARCHGUESS = apple
+endif
+ifeq ($(HOSTNAME),Rohan)
+  ARCHGUESS = macosx
+endif
+ifeq ($(HOSTNAME),ubuntu-machine)  
+  ARCHGUESS = armbuntu
+endif
+ifeq ($(HOSTNAME), quartz)
+  ARCHGUESS = toss3
+endif
+ifeq ($(HOSTNAME), surface)
+  ARCHGUESS = toss3
+endif
+ifeq ($(HOSTNAME_D), summit)
+  ARCHGUESS = summit
+endif
+ifeq ($(UNAME),i686)
+  ARCHGUESS = linux
+endif
