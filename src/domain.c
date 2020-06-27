@@ -401,26 +401,9 @@ void recursive_bisection_domset(DDC *ddc) {
       domainset_allGather(&ddc->domains);
 }
 
-// Initialize the random number generator 
-#define _SEED  3356;
-int    _idum = _SEED;
-// declare static members
-static const int _im   =2147483647;
-static const int _iq   =127773;
-static const int _mask =123459876;
-
-//  Random number generator of Park and Miller
-//  adapted from "Numerical Recipes in C", 2nd. Edition, p.279
-//  Returns a uniform random deviate between 0. and 1.
 double my_rand(void)
 {
-   _idum ^= _mask;
-   long    k = _idum/_iq;
-   _idum = 16807 * (_idum - k*_iq) - 2836*k;
-   if(_idum < 0) _idum += _im;
-   double  ans = (double)(_idum)/(double)(_im);
-   _idum ^= _mask;
-   return ans;
+   return drand48(); 
 } 
 
 static int comparePositionsX(const void* av, const void* bv)
@@ -468,7 +451,6 @@ void domainset_randomCenters(DOMAINSET* mydomains, int lx, int ly, int lz)
 
    int nTasks = mydomains->size;
 
-   _idum = _SEED;
 
    // generate centers in domain [0,1]**3
    for (int id=0;id<nTasks;id++)
