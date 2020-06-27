@@ -1,0 +1,6 @@
+[submodule "cub"]
+    path = cub
+    url = https://github.com/NVlabs/cub.git
+[submodule "util"]
+	path = util
+	url = https://github.com/llnl/simutil.git
