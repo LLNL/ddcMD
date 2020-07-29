@@ -31,10 +31,10 @@ The code determines the architecture by the hostname of the machine defined in d
 ifeq ($(HOSTNAME_D), summit)
   ARCHGUESS = summit
 endif
-``
+```
 The script will invoke summit.mk during the building process.
 
-If user wants to build the code on a machine with the hostname that cannot find in ddcMD/arch/Makefile.arch, user can add the new hostname to the file and use the corresponding *.mk architecture file. If user cannot find the architecture file in ddcMD/arch, user can use any of the *.mk files as template and modify compiler flags and libraries.
+If user wants to build the code on a machine with the hostname that cannot find in ddcMD/arch/Makefile.arch, user can add the new hostname to the file and use the corresponding \*.mk architecture file. If user cannot find the architecture file in ddcMD/arch, user can use any of the \*.mk files as template and modify compiler flags and libraries.
 
 In the future, CMake will also be provided to ease the building process.  
 
