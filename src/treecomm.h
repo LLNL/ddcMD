@@ -1,1 +1,1 @@
-../recbis/treecomm.h
+../recbis/src/treecomm.h

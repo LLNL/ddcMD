@@ -1,1 +1,1 @@
-../recbis/redistribute.c
+../recbis/src/redistribute.c

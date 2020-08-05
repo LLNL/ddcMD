@@ -1,1 +1,1 @@
-../recbis/equalize.c
+../recbis/src/equalize.c

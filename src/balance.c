@@ -1,1 +1,1 @@
-../recbis/balance.c
+../recbis/src/balance.c
