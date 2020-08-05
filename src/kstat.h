@@ -1,1 +1,1 @@
-../recbis/kstat.h
+../recbis/src/kstat.h

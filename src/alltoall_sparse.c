@@ -1,1 +1,1 @@
-../recbis/alltoall_sparse.c
+../recbis/src/alltoall_sparse.c

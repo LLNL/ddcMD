@@ -1,1 +1,1 @@
-../recbis/genptr.c
+../recbis/src/genptr.c

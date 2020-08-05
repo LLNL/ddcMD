@@ -1,1 +1,1 @@
-../recbis/balance.h
+../recbis/src/balance.h
