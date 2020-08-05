@@ -4,3 +4,6 @@
 [submodule "util"]
 	path = util
 	url = https://github.com/llnl/simutil.git
+[submodule "recbis"]
+	path = recbis
+	url = https://github.com/LLNL/recbis
