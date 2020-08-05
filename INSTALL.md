@@ -7,7 +7,7 @@ git clone git@github.com:LLNL/ddcMD.git
 ```
 
 ### Build code
-After downloading, go to the ddcMD home directory and use git submodule command to obtain two dependent libraries: 
+After downloading, go to the ddcMD home directory and use git submodule command to obtain three dependent libraries: 
 NVIDIA [CUB](https://github.com/NVlabs/cub) library and LLNL [simutil](https://github.com/LLNL/simutil) and [recbis](https://github.com/LLNL/recbis) libraries.
 ```
 cd ddcMD
