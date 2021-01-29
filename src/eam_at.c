@@ -1,6 +1,7 @@
 #include "eam_at.h"
 
 #include <math.h>
+#include <mpi.h>
 
 #include "ddcMalloc.h"
 #include "utilities.h"

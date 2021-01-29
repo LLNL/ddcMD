@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include "object.h"
 #include "ddcMalloc.h"
 #include "restraint.h"
@@ -94,7 +95,11 @@ RESTRAINTLIST *restraint_init(void *parent, char *name)
        }
      */
 
+#if __APPLE__
+    qsort(restraint->restraintList, restraint->nRestraint, sizeof (RESTRAINTPARMS*),(int(*)(const void*,const void*))compareRestraint);
+#else
     qsort(restraint->restraintList, restraint->nRestraint, sizeof (RESTRAINTPARMS*), (__compar_fn_t) compareRestraint);
+#endif
     /*
        for(int i = 0; i < restraint->nRestraint; i++){
        RESTRAINTPARMS *restraintparms=restraint->restraintList[i];

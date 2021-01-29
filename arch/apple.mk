@@ -6,12 +6,12 @@ ARCHDESC = Apple OSX, mpicc/mpif90 compilers
 #set this variable if an include file is used for extra dependencies
 ARCHINCLUDE = 1
 
-CPP = mpic++ -std=c++11 
+CPP = mpicxx -std=c++11 
 CC = mpicc -std=gnu99
 
 
-#MACPORTS_ROOT = $(HOME)/MacPorts
-MACPORTS_ROOT = /opt/local/
+MACPORTS_ROOT = $(HOME)/inst/macports
+#MACPORTS_ROOT = /opt/local/
 
 # FFT library needs to be included here
 CFLAGS_BASE =  -DUSE_FFTW2 -I$(MACPORTS_ROOT)/include -DWITH_MPI -DWITH_PIO -D_GNU_SOURCE -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas
