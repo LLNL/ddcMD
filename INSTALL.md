@@ -1,12 +1,12 @@
 ## INSTALLATION GUIDE 
 
-### Obtain the code
+## Obtain the code
 Download the code from GitHub
 ```
 git clone git@github.com:LLNL/ddcMD.git
 ```
 
-### Build code
+## Build code
 After downloading, go to the ddcMD home directory and use git submodule command to obtain three dependent libraries: 
 NVIDIA [CUB](https://github.com/NVlabs/cub) library and LLNL [simutil](https://github.com/LLNL/simutil) and [recbis](https://github.com/LLNL/recbis) libraries.
 ```
@@ -14,13 +14,31 @@ cd ddcMD
 git submodule update --init --recursive
 ```
 
+### 1. Use CMake 
+Compile code without GPU/CUDA
+
+```
+mkdir build && cd build
+cmake -DUSE_GPU=OFF ../
+make -j16
+```
+
+Compile code with GPU/CUDA
+
+```
+mkdir build && cd build
+cmake -DUSE_GPU=ON ../
+make -j16
+```
+### 2. Use makefile
+
 The makefile is in ddcMD/src directory. If the make command is successful, an executable, ddcmd-{arch}, will be generated in ddcMD/bin
 ```
 cd src
 make
 ```
 
-### Support architectures
+#### Support architectures
 Currently, the code only supports a few architectures as shown in ddcMD/arch
 ```
 apple.mk  armbuntu.mk  macosx.mk  sierra.mk  summit.mk  toss3.mk
@@ -36,5 +54,4 @@ The script will invoke summit.mk during the building process.
 
 If user wants to build the code on a machine with the hostname that cannot find in ddcMD/arch/Makefile.arch, user can add the new hostname to the file and use the corresponding \*.mk architecture file. If user cannot find the architecture file in ddcMD/arch, user can use any of the \*.mk files as template and modify compiler flags and libraries.
 
-In the future, CMake will also be provided to ease the building process.  
 
