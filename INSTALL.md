@@ -1,12 +1,12 @@
 ## INSTALLATION GUIDE 
 
-## Obtain the code
+## 1. Obtain the code
 Download the code from GitHub
 ```
 git clone git@github.com:LLNL/ddcMD.git
 ```
 
-## Build code
+## 2. Build code
 After downloading, go to the ddcMD home directory and use git submodule command to obtain three dependent libraries: 
 NVIDIA [CUB](https://github.com/NVlabs/cub) library and LLNL [simutil](https://github.com/LLNL/simutil) and [recbis](https://github.com/LLNL/recbis) libraries.
 ```
@@ -14,7 +14,7 @@ cd ddcMD
 git submodule update --init --recursive
 ```
 
-### 1. Use CMake 
+### 2.1. Use CMake 
 Compile code without GPU/CUDA
 
 ```
@@ -30,7 +30,19 @@ mkdir build && cd build
 cmake -DUSE_GPU=ON ../
 make -j16
 ```
-### 2. Use makefile
+
+Use IBM XL compiler
+```
+CC=xlc CXX=xlc++ cmake ../
+```
+
+Use Intel compiler
+
+```
+CC=icc CXX=icpc cmake ../
+```
+
+### 2.2. Use makefile
 
 The makefile is in ddcMD/src directory. If the make command is successful, an executable, ddcmd-{arch}, will be generated in ddcMD/bin
 ```
@@ -38,7 +50,7 @@ cd src
 make
 ```
 
-#### Support architectures
+#### 2.2.1. Support architectures
 Currently, the code only supports a few architectures as shown in ddcMD/arch
 ```
 apple.mk  armbuntu.mk  macosx.mk  sierra.mk  summit.mk  toss3.mk

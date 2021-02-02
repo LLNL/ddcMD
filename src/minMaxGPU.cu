@@ -191,7 +191,7 @@ double *getMinMaxGPU(COLLECTION *collection, STATE *gpuState_h, STATE* hostState
 
 double *getMinMaxGPU(COLLECTION *collection, STATE *gpuState_h, STATE* hostState, double *mmgpu) 
 {
-     GPUNLIST *gnlist = collection->gnlist; 
+    //GPUNLIST *gnlist = collection->gnlist; 
     //cub::CachingDeviceAllocator  g_allocator(true);
     size_t temp_storage_bytes = 0;
     void *d_temp_storage = NULL;
