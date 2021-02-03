@@ -12,6 +12,7 @@ set(VERSION_STRING ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 # enable fortran, c, and c++ language
 enable_language(C CXX)
+message(STATUS "Compiler is ${CMAKE_CXX_COMPILER_ID}")
 
 option(USE_GPU  "Build on GPU" ON)
 
@@ -36,12 +37,11 @@ else()
     message(FATAL_ERROR "ddcMD does not support a ${CMAKE_SYSTEM_NAME} system")
 endif()
 
-message(STATUS "Compiler is ${CMAKE_CXX_COMPILER_ID}")
-if (CMAKE_CXX_COMPILER_ID STREQUAL "XL")
-    if(${CMAKE_VERSION} VERSION_GREATER "3.17.999")
-    message(FATAL_ERROR "For XL compiler please use CMAKE version less than 3.17")
-    endif()
-endif()
+#if (CMAKE_CXX_COMPILER_ID STREQUAL "XL")
+#    if(${CMAKE_VERSION} VERSION_GREATER "3.17.999")
+#    message(FATAL_ERROR "For XL compiler please use CMAKE version less than 3.17")
+#    endif()
+#endif()
 # find MPI library
 find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
