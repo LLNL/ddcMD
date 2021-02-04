@@ -1,0 +1,112 @@
+
+simulate SIMULATE
+{
+    type = MD;
+    system=system;
+   integrator=nglf;
+   //deltaloop=1;
+   deltaloop=10;
+    maxloop =1000000;
+   dt = 20;
+   printrate=1;
+   snapshotrate=100000;
+   checkpointrate=100000;
+   nLoopDigits=12;
+   gidFormat=hex;
+    printinfo=printinfo;
+    heap=heap;
+    ddc = ddc;
+   //analysis = writeCharmm;
+   //accelerator=accelerator;
+}
+
+accelerator ACCELERATOR
+{
+   type=CUDA;
+   maxPagesPerParticle = 1;
+}
+
+energyInfo ENERGYINFO{}
+heap HEAP { size = 1000 ;}
+
+//ddc DDC { }
+//ddc DDC { lx=2;ly=2;lz=1; ddcRule = rule; loadbalance=balance;}
+//ddc DDC { lx=2;ly=2;lz=1; }
+ddc DDC { updateRate=20; }
+
+//balance LOADBALANCE {
+//   type=bisection;
+//}
+
+//rule DDCRULE { type = MARTINI;}
+
+printinfo PRINTINFO
+{
+  PRESSURE=bar;
+  VOLUME = Ang^3;
+  TEMPERATURE = K;
+  ENERGY = kJ/mol;
+  TIME = ns;
+  printStress=0;
+  printMolecularPressure=1;
+}
+
+martini  POTENTIAL
+{
+   type = MARTINI;
+   excludePotentialTerm=0;
+   use_transform=0;
+   cutoff=11.0 Angstrom;
+   rcoulomb=11.0 Angstrom; epsilon_r=15; epsilon_rf=-1;
+   function=lennardjones;
+   parmfile=martini.data;
+}
+
+restraint POTENTIAL { type =RESTRAINT; parmfile=restraint.data;}
+
+//nglf INTEGRATOR {type = NGLF; }
+nglf INTEGRATOR {type = NGLFCONSTRAINT; T=310K; P0 = 1.0 bar; beta = 3.0e-4/bar; tauBarostat = 1.0 ps;}
+//nglf INTEGRATOR { type=NGLFCONSTRAINTGPULANGEVIN; T=310K; P0 = 1.0 bar; beta = 3.0e-4 /bar; tauBarostat = 1.0 ps; isotropic=1; }
+//nglf INTEGRATOR { type=NGLFGPULANGEVIN; T=310K; P0 = 1.0 bar; beta = 3.0e-4/bar; tauBarostat = 1.0 ps; has_cons=0; isotropic=1; }
+//nglf INTEGRATOR { type=NGLFGPU; T=310K; P0 = 1.0 bar; beta = 3.0e-4/bar; tauBarostat = 1.0 ps;}
+
+system SYSTEM
+{
+   type = NORMAL;
+   potential = martini ;
+   neighbor=nbr;
+   groups= group free ;
+   random = lcg64;
+   box = box;
+   collection=collection;
+   moleculeClass = moleculeClass;
+   nConstraints=0;
+}
+
+// vcm TRANSFORM { type=SETVELOCITY; vcm=0 0 0;}
+
+box BOX { type=ORTHORHOMBIC; pbc=7; }
+
+nbr NEIGHBOR { type = NORMAL; deltaR=4.0000; minBoxSide=6; }
+
+group GROUP { type = LANGEVIN; Teq=310K; tau=1ps; useDefault=0;}
+free GROUP { type = LANGEVIN; Teq=310K; tau=1ps; useDefault=0;}
+//free   GROUP { type = FREE;  }
+
+lcg64 RANDOM {type = LCG64;randomizeSeed=1;}
+
+// Analysis - calculate pair correlcation function
+//martini ANALYSIS { type = PAIRCORRELATION; eval_rate=100; delta_r =0.05; length=40; outputrate=1000; }
+
+// Analysis - output COM of system
+//vcm ANALYSIS { type =  vcmWrite; outputrate=1000; }
+
+writeCharmm  ANALYSIS { type = subsetWrite; outputrate=10000; format=binaryCharmm; }
+
+moleculeClass MOLECULECLASS { molecules =  Wx WFx; }
+
+Wx MOLECULE {ownershipSpecies = WxW; species = WxW;}
+WFx MOLECULE {ownershipSpecies = WFxWF; species = WFxWF;}
+
+WxW SPECIES { type = ATOM ; charge =0.0; id=1; mass =72.0 M_p ; }
+WFxWF SPECIES { type = ATOM ; charge =0.0; id=0; mass =72.0 M_p ; }

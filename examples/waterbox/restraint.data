@@ -1,0 +1,8 @@
+restraint RESTRAINTLIST{
+  xbox = 93.858;
+  ybox = 93.858;
+  zbox = 93.858;
+  restraintList=;
+}
+
+

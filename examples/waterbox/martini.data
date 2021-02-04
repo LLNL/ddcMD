@@ -1,0 +1,48 @@
+martini MMFF
+{
+resiParms=W WF ;
+atomTypeList=BP4 P4 ;
+ljParms=P4_P4 P4_BP4 BP4_BP4 ;
+}
+
+BP4 MASSPARMS { atomType=BP4; atomTypeID=0; mass=72.0M_p ; }
+P4 MASSPARMS { atomType=P4; atomTypeID=1; mass=72.0M_p ; }
+
+W RESIPARMS
+{
+  resID=1;
+  resType=0;
+  resName=W;
+  charge=0.0;
+  groupList=W_g0;
+  centerAtom=0;
+}
+
+W_g0 GROUPPARMS{
+  groupID=0;
+  atomList=W_W ;
+}
+
+W_W ATOMPARMS{atomID=0; atomName=W; atomType=P4; atomTypeID=1; charge=0.0; mass=72.0 M_p ; }
+
+WF RESIPARMS
+{
+  resID=2;
+  resType=0;
+  resName=WF;
+  charge=0.0;
+  groupList=WF_g0;
+  centerAtom=0;
+}
+
+WF_g0 GROUPPARMS{
+  groupID=0;
+  atomList=WF_WF ;
+}
+
+WF_WF ATOMPARMS{atomID=0; atomName=WF; atomType=BP4; atomTypeID=0; charge=0.0; mass=72.0 M_p ; }
+
+P4_P4 LJPARMS{atomtypeI=P4; indexI=1; atomtypeJ=P4; indexJ=1; sigma=0.47 nm; eps=5.0 kJ*mol^-1;}
+P4_BP4 LJPARMS{atomtypeI=P4; indexI=1; atomtypeJ=BP4; indexJ=0; sigma=0.57 nm; eps=5.6 kJ*mol^-1;}
+BP4_BP4 LJPARMS{atomtypeI=BP4; indexI=0; atomtypeJ=BP4; indexJ=0; sigma=0.47 nm; eps=5.0 kJ*mol^-1;}
+
