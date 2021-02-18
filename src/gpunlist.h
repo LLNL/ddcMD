@@ -25,7 +25,7 @@ typedef struct gpunlist_st {
     double *scratch, *scratch1, *scratch2, *scratch3, *scratch4; //scratch space
     double *partialCOMx, *partialCOMy, *partialCOMz;
     double *virCorx, *virCory, *virCorz;
-    int *r_backg, *r_backbg, *binHeadsg, *binCountsg, *binCountsg2, *listIdsg, *partial_sumsg;
+    int *r_backg, *r_backbg, *binHeadsg, *binHeadsgSave, *binCountsg, *binCountsg2, *listIdsg, *partial_sumsg;
     double *minsg, *lensg;
     int *nbinsg, *nbrIds, *nbrIdsx, *nbrIdsy, *nbrIdsz;
     int numNbrs, nBinsTot;

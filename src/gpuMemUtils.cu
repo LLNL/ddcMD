@@ -159,6 +159,7 @@ void allocGPUState(COLLECTION *collection, int nIon)
     gnlist->binCountsg = NULL;
     gnlist->binCountsg2= NULL;
     gnlist->binHeadsg  = NULL;
+    gnlist->binHeadsgSave  = gnlist->binHeadsg;
     gnlist->partial_sumsg = NULL;
     nvtxRangePop();
 
@@ -208,8 +209,8 @@ void allocGPUnbins(GPUNLIST *gnlist, const int nBinsTot, const int blocksize)
         if(gnlist->binCountsg2 != NULL){
             CUDA_SAFE_CALL(cudaFree(gnlist->binCountsg2);)
         }
-        if(gnlist->binHeadsg != NULL){
-            CUDA_SAFE_CALL(cudaFree(gnlist->binHeadsg);)
+        if(gnlist->binHeadsgSave != NULL){
+            CUDA_SAFE_CALL(cudaFree(gnlist->binHeadsgSave);)
         }
         
         // allocate 2X memory for bins/partial sums
@@ -217,6 +218,7 @@ void allocGPUnbins(GPUNLIST *gnlist, const int nBinsTot, const int blocksize)
         gpu_allocator(gnlist->binCountsg, nBinsTot2);
         gpu_allocator(gnlist->binCountsg2, nBinsTot2);
         gpu_allocator(gnlist->binHeadsg, nBinsTot2);
+        gnlist->binHeadsgSave = gnlist->binHeadsg;
 
         accParms->totbins=nBinsTot2;       
 
@@ -314,6 +316,7 @@ void deallocGPU(SYSTEM *sys, int n)
     CUDA_SAFE_CALL(cudaFree((gnlist->binCountsg)));
     cudaFree((gnlist->binCountsg2));
     cudaFree((gnlist->binHeadsg));
+    gnlist->binHeadsg=NULL;
     cudaFree((gnlist->listIdsg));
     CUDA_SAFE_CALL(cudaFree((gnlist->partial_sumsg)));
 

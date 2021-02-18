@@ -3,6 +3,7 @@
 #include <thrust/execution_policy.h>
 #include <thrust/pair.h>
 #include <nvToolsExt.h>
+#include "ddcMalloc.h"
 #include "pairProcessGPU.h"
 #include "nlistGPU.h"
 #include "cudaUtils.h"
@@ -32,7 +33,7 @@
 #define TPP_EVAL 1
 #define TPP_EVALp 1
 #define  CHECK_1(x)     //first layer of Debugging, summary of binning data
-#define CHECK_2(x)   //second layer of debugging, print all binning data
+#define CHECK_2(x)    //second layer of debugging, print all binning data
 #define CHECK_3(x)   //not used rn
 #define CHECK(x)   //final layer of debugging, print all particle data
 #define CHECKB (x) 
@@ -1153,7 +1154,7 @@ void binParticlesGPU(SYSTEM * sys, double rcut)
     double *minsg, *lensg;
     minsg = gnlist->minsg;
     lensg = gnlist->lensg;
-
+  
     //determine number of bins necessary based on cutoff
     CHECK_1(
             printf("box len %f %f %f \n", lens[0], lens[1], lens[2]);
@@ -1166,7 +1167,6 @@ void binParticlesGPU(SYSTEM * sys, double rcut)
     //binL[0] = lens[0] / nbins[0];
     //binL[1] = lens[1] / nbins[1];
     //binL[2] = lens[2] / nbins[2];
-
     int nBinsTot = nbins[0] * nbins[1] * nbins[2];
     gnlist->nBinsTot = nBinsTot;
     //int tBins = nbins[0]*nbins[1]*nbins[2]; 
@@ -1267,44 +1267,63 @@ void binParticlesGPU(SYSTEM * sys, double rcut)
         //27 if 1d
         // 9 if 2d
         // 3 if 1d
-        int* x_nbr;
-    int* y_nbr;
-    int* z_nbr;
+        int* x_nbr=NULL;
+    int* y_nbr=NULL;
+    int* z_nbr=NULL;
     int num_x_nbr = 3;
     int num_y_nbr = 3;
     int num_z_nbr = 3;
     if (nbins[0] > 1)
     {
-        int x_nbr1 [3] = {-1, 0, 1};
-        x_nbr = x_nbr1;
+        //int x_nbr1 [3] = {-1, 0, 1};
+        //x_nbr = x_nbr1;
+        x_nbr=(int *)ddcMalloc(num_x_nbr*sizeof(int));
+        x_nbr[0]=-1;
+        x_nbr[1]=0;
+        x_nbr[2]=1;
     }
     else
     {
-        int x_nbr1 [1] = {0};
-        x_nbr = x_nbr1;
+        //int x_nbr1 [1] = {0};
+        //x_nbr = x_nbr1;
         num_x_nbr = 1;
+        x_nbr=(int *)ddcMalloc(num_x_nbr*sizeof(int));
+        x_nbr[0]=0;
     }
     if (nbins[1] > 1)
     {
-        int y_nbr1 [3] = {-1, 0, 1}; //{-nbins[0],0,nbins[0]};
-        y_nbr = y_nbr1;
+        //int y_nbr1 [3] = {-1, 0, 1}; //{-nbins[0],0,nbins[0]};
+        //y_nbr = y_nbr1;
+        y_nbr=(int *)ddcMalloc(num_y_nbr*sizeof(int));
+        y_nbr[0]=-1;
+        y_nbr[1]=0;
+        y_nbr[2]=1;
+
     }
     else
     {
-        int y_nbr1 [1] = {0};
-        y_nbr = y_nbr1;
+        //int y_nbr1 [1] = {0};
+        //y_nbr = y_nbr1;
         num_y_nbr = 1;
+        y_nbr=(int *)ddcMalloc(num_y_nbr*sizeof(int));
+        y_nbr[0]=0;
     }
     if (nbins[2] > 1)
     {
-        int z_nbr1 [3] = {-1, 0, 1}; //{-nbins[0]*nbins[1],0,nbins[0]*nbins[1]};
-        z_nbr = z_nbr1;
+        //int z_nbr1 [3] = {-1, 0, 1}; //{-nbins[0]*nbins[1],0,nbins[0]*nbins[1]};
+        //z_nbr = z_nbr1;
+        z_nbr=(int *)ddcMalloc(num_z_nbr*sizeof(int));
+        z_nbr[0]=-1;
+        z_nbr[1]=0;
+        z_nbr[2]=1;
     }
     else
     {
-        int z_nbr1 [1] = {0};
-        z_nbr = z_nbr1;
+        //int z_nbr1 [1] = {0};
+        //z_nbr = z_nbr1;
         num_z_nbr = 1;
+        z_nbr=(int *)ddcMalloc(num_z_nbr*sizeof(int));
+        z_nbr[0]=0;
     }
 
     CHECK_1(
@@ -1351,6 +1370,12 @@ void binParticlesGPU(SYSTEM * sys, double rcut)
     gpu_memcpy_host2device(gnlist->nbrIdsy, y_nbr, num_y_nbr);
     gpu_memcpy_host2device(gnlist->nbrIdsz, z_nbr, num_z_nbr);
     gpu_memcpy_host2device(gnlist->numNbrsxyz, num_nbrsxyz, 3);
+
+
+    // Free the memory of pointers
+    ddcFree(x_nbr);
+    ddcFree(y_nbr);
+    ddcFree(z_nbr);
 }
 
 //

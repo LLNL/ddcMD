@@ -95,7 +95,6 @@ if(USE_GPU)
     else()
         target_compile_options(ddcMD-gpu PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_70,code=sm_70 -gencode=arch=compute_60,code=sm_60>)
     endif()
-    # GPU code is debug only -TODO
     target_compile_options(ddcMD-gpu PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-g>)
     #link_directories("/usr/tce/packages/cuda/cuda-10.1.243/lib64")
     #target_compile_options(ddcMD-gpu PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_70,code=sm_70>)

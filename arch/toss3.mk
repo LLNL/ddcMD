@@ -50,7 +50,7 @@ ifeq ($(USE_GPU), 1)
 
   NVCC = $(CUDAHOME)/bin/nvcc -std=c++11
 
-  NVCCFLAGS_OPT  = $(NVCCFLAGS_BASE)  -g
+  NVCCFLAGS_OPT  = $(NVCCFLAGS_BASE)  -O3
   NVCCFLAGS_DEBUG  = $(NVCCFLAGS_BASE)  -g -G
   NVCCFLAGS_PROF  = $(NVCCFLAGS_BASE)   -g -pg
 
