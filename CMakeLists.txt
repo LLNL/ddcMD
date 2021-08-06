@@ -16,8 +16,8 @@ message(STATUS "Compiler is ${CMAKE_CXX_COMPILER_ID}")
 
 option(USE_GPU  "Build on GPU" ON)
 
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 set(CMAKE_C_STANDARD 99)
