@@ -20,11 +20,18 @@ void objectSetup(void *parms, MPI_Comm comm)
    MPI_Comm_rank(comm, &myRank);
    if (myRank == 0)
    {
-      if (filetest(commonParms.objectFile, S_IFREG) != 0)
+      char *objectFiles = strdup(commonParms.objectFile); 
+      char *objectFile = strtok(objectFiles," "); 
+      while(objectFile != NULL) 
       {
-         printf("objectfile=%s does not exist or wrong type\n", commonParms.objectFile);
-         abortAll(1);
+         if (filetest(objectFile, S_IFREG) != 0)
+         {
+            printf("objectfile=%s does not exist or wrong type\n", objectFile);
+            abortAll(1);
+         }
+         objectFile = strtok(NULL," "); 
       }
+      free(objectFiles); 
       if (filetest(commonParms.restartFile, S_IFREG) != 0)
       {
          printf("restart=%s does not exist or wrong type\n", commonParms.restartFile);
