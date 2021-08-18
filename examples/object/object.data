@@ -1,0 +1,137 @@
+// This is a ddcMD simulation control file. The default name of file is object.data.
+// If you named the file differently, you should run by "-o <your_file_name>" option.
+
+// The SIMULATE object, simulate is the name of SIMULATE object (you can name it differetly).
+// It is a top level simulation control object.
+simulate SIMULATE
+{
+   type = MD;         // type of simulate. We will run MD here.
+   system=system;     // Name of SYSTEM object, which is defined in following section
+   integrator=nglf;   // Name of INTEGRATOR object, which is defined in following section
+   deltaloop=10000;   // The number of MD steps (loops) in current run
+   maxloop=1000000;   // The maximum number of MD steps (loops) for the simulation system
+   dt=20;             // The timestep in MD simulation (fs)
+   printrate=1000;    // Output rate of simulation energy terms, temperature, box info, etc for the data file
+                      // Keep this the same or lower than writeCharmm
+   snapshotrate=0;    // Output rate of individual snapshot frames in text format i.e. atoms#000000 file
+   checkpointrate=10000; // Checkpoint/restart files output rate
+   nLoopDigits=12;    // Use large MD loop number, 12 digit number
+   //gidFormat=hex;   // Output the particle gid number in HEX format 
+   printinfo=printinfo; // Name of PRINTINFO object to control units of output data in data file
+   heap=heap;           // Name of HEAP object for the size of CPU memory usage
+   ddc = ddc;           // Name of DDC object for neighour table parameters
+   analysis = writeCharmm;  // Name of ANALYSIS object, here use to output individual snapshot frames in binary format
+   accelerator=accelerator; // Name of ACCELERATOR object to define GPU accelerator
+}
+
+// ACCELERATOR object to define paramters for GPU accelerator
+accelerator ACCELERATOR
+{
+   type=CUDA;               // Use the CUDA code in ACCELERATOR
+   maxPagesPerParticle = 1; // Max number of pages for each particle
+}
+
+// ENERGYINFO object to output energy info, currently set empty
+energyInfo ENERGYINFO{}     //
+
+// HEAP object for the size of CPU memory usage
+heap HEAP { size = 1000 ;}
+
+// DDC object for neighour table parameters
+ddc DDC { updateRate=20; } // Update neighbortalbe and redomain (range 10-20) at every 20 steps.
+
+// PRINTINFO object to control units of output data in data file
+printinfo PRINTINFO
+{
+  PRESSURE=bar;    // Unit for PRESSURE
+  VOLUME = Ang^3;  // Unit for VOLUME
+  TEMPERATURE = K; // Unit for TEMPERATURE
+  ENERGY = kJ/mol; // Unit for ENERGY
+  TIME = ns;       // Unit for TIME
+  printStress=0;   // control if print out Stress term (0 means turns off)
+  printMolecularPressure=1; // control if print out pressure based on molecular calculation.
+}
+
+// POTENTIAL object to specify which potential to include
+// Here MARTINI potential is included
+martini POTENTIAL
+{
+   type=MARTINI;            // Type of POTENTIAL
+   excludePotentialTerm=0;  // To control if some energy terms are excluded. 
+                            // 0 means no energy terms are excluded
+   use_transform=0;         // don't noot use transform
+   cutoff=11.0 Angstrom;    // Lennard Jones cutoff
+   rcoulomb=11.0 Angstrom;  // Coulomb calculation cutoff
+   epsilon_r=15; epsilon_rf=-1; // Parameters for Reaction Field model
+   function=lennardjones;   // VDW calculation uses Lennard Jones function
+   parmfile=martini.data;   // Parameter file input is martini.data
+}
+
+// POTENTIAL object to specify which potential to include
+// Here restraint potential is included
+restraint POTENTIAL 
+{ 
+   type=RESTRAINT;          // Type of POTENTIAL
+   parmfile=restraint.data; // Parameter file input is restraint.data
+}
+
+// INTEGRATOR object for integration of motions.
+nglf INTEGRATOR 
+{ 
+   type=NGLFCONSTRAINTGPULANGEVIN; // Type of INTEGRATOR
+   T=310K;                 // Temperature
+   P0 = 1.0 bar;           // Reference pressure
+   beta = 3.0e-4/bar;      // Compressibility
+   tauBarostat = 1.0 ps;   // tau value of barostat
+}
+
+// SYSTEM object to specify the simulation system
+system SYSTEM
+{
+   type = NORMAL;        // type of SYSTEM 
+   potential = martini restraint ; // list of potentials to included in calculation.
+   neighbor=nbr;         // method of neighbor table calculation
+   groups= group free ;  // groups of particles
+   random = lcg64;       // method of random number generation
+   box = box;            // box method
+   collection=collection;// particle collection
+   moleculeClass = moleculeClass; // take moleculeClass from molecule.data file
+   // fix XXX - should be changed per simulation - XXX
+   nConstraints=5866;    // number of Constraints in the system
+}
+
+// vcm TRANSFORM { type=SETVELOCITY; vcm=0 0 0;}
+
+// BOX object for PBC calculation
+box BOX { type=ORTHORHOMBIC; pbc=7; }
+
+// NEIGHBOR object for neighbor table calcultion
+nbr NEIGHBOR 
+{ 
+   type = NORMAL; // Type of NEIGHBOR
+   deltaR=4.0000; // Additional deltaR for R cutoff 
+   minBoxSide=6;  // minimum box side
+}
+
+// Two groups defined for the particles
+group GROUP { type = LANGEVIN; Teq=310K; tau=1ps; useDefault=0;}
+free GROUP { type = LANGEVIN; Teq=310K; tau=1ps; useDefault=0;}
+//free   GROUP { type = FREE;  }
+
+// RANDOM object for random number generation
+lcg64 RANDOM {type = LCG64;randomizeSeed=1;}
+
+// Analysis - calculate pair correlcation function
+//martini ANALYSIS { type = PAIRCORRELATION; eval_rate=100; delta_r =0.05; length=40; outputrate=1000; }
+
+// Analysis - output COM of system
+//vcm ANALYSIS { type =  vcmWrite; outputrate=1000; }
+
+// ANALYSIS objectory to write out snapshot frame in the  binary format
+writeCharmm  ANALYSIS 
+{ 
+   type = subsetWrite;  // Type of ANALYSIS
+   outputrate=1000;     // ouotput frequency of snapshot frame
+   format=binaryCharmm; // use binary format
+}
+
