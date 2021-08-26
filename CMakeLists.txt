@@ -56,7 +56,7 @@ if(OpenMP_FOUND)
 endif(OpenMP_FOUND)
 
 # find MPI library
-find_package(MPI REQUIRED)
+find_package(MPI REQUIRED COMPONENTS C CXX MPICXX)
 include_directories(${MPI_INCLUDE_PATH})
 
 # find FFTW library
