@@ -118,12 +118,12 @@ ORDERSH_PARMS *orderSH_parms(OBJECT*object)
 		types[0] = MPI_UNSIGNED;
 		types[1] = MPI_DOUBLE;
 		types[2] = MPI_DOUBLE;
-		MPI_Address(&cluster[0].label, &disp[0]);
-		MPI_Address(&cluster[0].Rrms, &disp[1]);
-		MPI_Address(&cluster[0].qAve, &disp[2]);
+		MPI_Get_address(&cluster[0].label, &disp[0]);
+		MPI_Get_address(&cluster[0].Rrms, &disp[1]);
+		MPI_Get_address(&cluster[0].qAve, &disp[2]);
 		for (i = n; i >= 0; i--)
 			disp[i] -= disp[0];
-		MPI_Type_struct(n, blkcnt, disp, types, &CLUSTER_TYPE);
+		MPI_Type_create_struct(n, blkcnt, disp, types, &CLUSTER_TYPE);
 	}
 	return parms;
 }

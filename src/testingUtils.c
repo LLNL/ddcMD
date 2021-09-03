@@ -10,7 +10,7 @@ void version_init(int argc,char *argv[]);
 void simulate(COMMAND_LINE_OPTIONS opt, MPI_Comm SimulateComm);
 void commons_init(void);
 
-MPI_Comm COMM_LOCAL;
+extern MPI_Comm COMM_LOCAL;
 
 static ROUTINE *routine;
 //static char* testFile = "";

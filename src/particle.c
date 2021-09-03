@@ -132,11 +132,11 @@ void *GetLocationinfo(int n, int index, MPI_Datatype*TYPE)
 	{
 		MPI_Datatype type = info[i].type;
 		MPI_Aint stride = info[i].stride;
-		MPI_Type_hvector(n, 1, stride, type, htype + i);
+		MPI_Type_create_hvector(n, 1, stride, type, htype + i);
 		MPI_Type_commit(htype+i); 
 		hstart = *info[i].start;
 		hstart += stride*index;
-		MPI_Address(hstart, &displs[i]);
+		MPI_Get_address(hstart, &displs[i]);
 		blockcount[i] = 1;
 	}
 
@@ -144,7 +144,7 @@ void *GetLocationinfo(int n, int index, MPI_Datatype*TYPE)
 	  displs[i - 1] -= displs[0];
 
 	if (*(TYPE) != 0) MPI_Type_free(TYPE);
-	MPI_Type_struct(nelements, blockcount, displs, htype, TYPE);
+	MPI_Type_create_struct(nelements, blockcount, displs, htype, TYPE);
 	MPI_Type_commit(TYPE);
 	hstart = *info[0].start;
 	hstart += info[0].stride*index;
@@ -164,17 +164,17 @@ void *GetLocationAccum(int n, int index, MPI_Datatype*TYPE)
 		type = accum[i].type;
 		stride = accum[i].stride;
 		assert(n>0);
-		MPI_Type_hvector(n, 1, stride, type, htype + i);
+		MPI_Type_create_hvector(n, 1, stride, type, htype + i);
 		hstart = *accum[i].start;
 		hstart += stride*index;
-		MPI_Address(hstart, &displs[i]);
+		MPI_Get_address(hstart, &displs[i]);
 		blockcount[i] = 1;
 	}
 
 	for (i = naccum; i > 0; i--)
 		displs[i - 1] -= displs[0];
 	if (*(TYPE) != 0) MPI_Type_free(TYPE);
-	MPI_Type_struct(naccum, blockcount, displs, htype, TYPE);
+	MPI_Type_create_struct(naccum, blockcount, displs, htype, TYPE);
 	MPI_Type_commit(TYPE);
 	hstart = *accum[0].start;
 	hstart += accum[0].stride*index;

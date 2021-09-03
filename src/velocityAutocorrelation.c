@@ -40,10 +40,10 @@ void registerREF(REF **ref)
 	MPI_Datatype types[] = { MPI_DOUBLE };
 	n = 1;
  	*ref = malloc(1*sizeof(REF));
-   MPI_Address(&((*ref)->r), disp + 0);
+   MPI_Get_address(&((*ref)->r), disp + 0);
    for (i = 1; i < n; i++) disp[i] -= disp[0];
    disp[0] = 0;
-   MPI_Type_struct(n, blkcnt, disp, types, &REF_TYPE);
+   MPI_Type_create_struct(n, blkcnt, disp, types, &REF_TYPE);
    MPI_Type_commit(&REF_TYPE);
    particleRegisterinfo((void *)ref, sizeof(REF), sizeof(REF), REF_TYPE,NULL,NULL);
 }

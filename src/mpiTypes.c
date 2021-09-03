@@ -36,12 +36,12 @@ MPI_Datatype domainx_MPIType(void)
       types[1] = threeVector_MPIType();
       types[2] = threeVector_MPIType();
       types[3] = MPI_INT; 
-      MPI_Address(&domain.radius, &disp[0]);
-      MPI_Address(&domain.center, &disp[1]);
-      MPI_Address(&domain.extent, &disp[2]);
-      MPI_Address(&domain.shape , &disp[3]);
+      MPI_Get_address(&domain.radius, &disp[0]);
+      MPI_Get_address(&domain.center, &disp[1]);
+      MPI_Get_address(&domain.extent, &disp[2]);
+      MPI_Get_address(&domain.shape , &disp[3]);
       for (int i = n-1; i >= 0; i--) disp[i] -= disp[0];
-      MPI_Type_struct(n, blkcnt, disp, types, &domainxType);
+      MPI_Type_create_struct(n, blkcnt, disp, types, &domainxType);
       MPI_Type_commit(&domainxType);
    }
    return domainxType;
@@ -86,14 +86,14 @@ MPI_Datatype particle_MPIType(void)
       blkcnt[0] = 2;
       blkcnt[1] = 1;
       blkcnt[2] = 1;
-      MPI_Address(&particle.domain_id, &disp[0]);
-      MPI_Address(&particle.global_index, &disp[1]);
-      MPI_Address(&particle.r.x, &disp[2]);
+      MPI_Get_address(&particle.domain_id, &disp[0]);
+      MPI_Get_address(&particle.global_index, &disp[1]);
+      MPI_Get_address(&particle.r.x, &disp[2]);
       types[0] = MPI_INT;
       types[1] = MPI_LONG_LONG;
       types[2] = threeVector_MPIType();
       for (int i = n-1; i >= 0; i--) disp[i] -= disp[0];
-      MPI_Type_struct(n, blkcnt, disp, types, &particleType);
+      MPI_Type_create_struct(n, blkcnt, disp, types, &particleType);
       MPI_Type_commit(&particleType);
    }
    return particleType;

@@ -40,13 +40,13 @@ MPI_Datatype lcg64_MPIType(void)
 		int blkcnt[] = { 1, 1, 1, };
 		MPI_Datatype types[] = {MPI_LONG_LONG, MPI_INT, MPI_INT,  };
 		int n = 3;
-		LCG64_PARM parm; 
-		MPI_Address(&(parm.state), disp + 0);
-		MPI_Address(&(parm.multID), disp + 1);
-		MPI_Address(&(parm.prime), disp + 2);
+		LCG64_PARM parm;
+        MPI_Get_address(&(parm.state), disp + 0);
+        MPI_Get_address(&(parm.multID), disp + 1);
+        MPI_Get_address(&(parm.prime), disp + 2);
 		for (int i = 1; i < n; i++) disp[i] -= disp[0];
 		disp[0] = 0;
-		MPI_Type_struct(n, blkcnt, disp, types, &PARM_TYPE);
+        MPI_Type_create_struct(n, blkcnt, disp, types, &PARM_TYPE);
 		MPI_Type_commit(&PARM_TYPE);
 		initialized = 1;
 	}

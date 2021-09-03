@@ -417,15 +417,15 @@ MPI_Datatype shortParticle_MPIType(void)
    blkcnt[0] = 3;
    blkcnt[1] = 1;
    blkcnt[2] = 3;
-   MPI_Address(&particle.domainID, &disp[0]);
-   MPI_Address(&particle.label, &disp[1]);
-   MPI_Address(&particle.rx, &disp[2]);
+   MPI_Get_address(&particle.domainID, &disp[0]);
+   MPI_Get_address(&particle.label, &disp[1]);
+   MPI_Get_address(&particle.rx, &disp[2]);
    types[0] = MPI_UNSIGNED;
    types[1] = MPI_GID_TYPE;
    types[2] = MPI_DOUBLE;
    for (int i = n-1; i >= 0; i--)
       disp[i] -= disp[0];
-   MPI_Type_struct(n, blkcnt, disp, types, &particleType);
+   MPI_Type_create_struct(n, blkcnt, disp, types, &particleType);
    MPI_Type_commit(&particleType);
    return particleType;
 }

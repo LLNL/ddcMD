@@ -73,13 +73,13 @@ void *GetRecvLocation(int nRecv, int RecvStart, MPI_Datatype*RECVTYPE)
 	blockcounts[0] = nRecv;
 	blockcounts[1] = nRecv;
 	blockcounts[2] = nRecv;
-	MPI_Address(rxptr + RecvStart, &displs[0]);
-	MPI_Address(ryptr + RecvStart, &displs[1]);
-	MPI_Address(rzptr + RecvStart, &displs[2]);
+	MPI_Get_address(rxptr + RecvStart, &displs[0]);
+	MPI_Get_address(ryptr + RecvStart, &displs[1]);
+	MPI_Get_address(rzptr + RecvStart, &displs[2]);
 	int n =3; 
 	for (int i = n-1; i >= 0; i--) displs[i] -= displs[0];
 	if (*(RECVTYPE) != 0) MPI_Type_free(RECVTYPE);
-	MPI_Type_struct(n, blockcounts, displs, type, RECVTYPE);
+	MPI_Type_create_struct(n, blockcounts, displs, type, RECVTYPE);
 	MPI_Type_commit(RECVTYPE);
 	return rxptr + RecvStart;
 }
@@ -91,19 +91,19 @@ void *GetForceLocation(int n, int Start, MPI_Datatype*TYPE,unsigned pCalculate)
 	int  blockcounts[] ={n,n,n,n,n,0};
 	MPI_Aint displs[6];
    int m=0;
-	MPI_Address(fxptr + Start, &displs[m++]);
-	MPI_Address(fyptr + Start, &displs[m++]);
-	MPI_Address(fzptr + Start, &displs[m++]);
-	if (pCalculate & 1) MPI_Address(energyptr + Start, &displs[m++]);
-	if (pCalculate & 2) MPI_Address(virialptr + Start, &displs[m++]);
+	MPI_Get_address(fxptr + Start, &displs[m++]);
+	MPI_Get_address(fyptr + Start, &displs[m++]);
+	MPI_Get_address(fzptr + Start, &displs[m++]);
+	if (pCalculate & 1) MPI_Get_address(energyptr + Start, &displs[m++]);
+	if (pCalculate & 2) MPI_Get_address(virialptr + Start, &displs[m++]);
 	if (pCalculate & 4) 
    {
       blockcounts[m]=6*n;
-      MPI_Address(sionptr + Start, &displs[m++]);
+      MPI_Get_address(sionptr + Start, &displs[m++]);
    }
 	for (int i = m-1; i >= 0; i--) displs[i] -= displs[0];
 	if (*(TYPE) != 0) MPI_Type_free(TYPE);
-	MPI_Type_struct(m, blockcounts, displs, type, TYPE);
+	MPI_Type_create_struct(m, blockcounts, displs, type, TYPE);
 	MPI_Type_commit(TYPE);
 	return fxptr + Start;
 }
@@ -143,13 +143,13 @@ void *GetVelocityLocation(int nRecv, int RecvStart, MPI_Datatype*RECVTYPE)
 	blockcounts[0] = nRecv;
 	blockcounts[1] = nRecv;
 	blockcounts[2] = nRecv;
-	MPI_Address(vxptr + RecvStart, &displs[0]);
-	MPI_Address(vyptr + RecvStart, &displs[1]);
-	MPI_Address(vzptr + RecvStart, &displs[2]);
+	MPI_Get_address(vxptr + RecvStart, &displs[0]);
+	MPI_Get_address(vyptr + RecvStart, &displs[1]);
+	MPI_Get_address(vzptr + RecvStart, &displs[2]);
 	int n =3; 
 	for (i = n-1; i >= 0; i--) displs[i] -= displs[0];
 	if (*(RECVTYPE) != 0) MPI_Type_free(RECVTYPE);
-	MPI_Type_struct(n, blockcounts, displs, type, RECVTYPE);
+	MPI_Type_create_struct(n, blockcounts, displs, type, RECVTYPE);
 	MPI_Type_commit(RECVTYPE);
 	return vxptr + RecvStart;
 }
