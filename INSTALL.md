@@ -1,7 +1,7 @@
 ## INSTALLATION GUIDE 
 
 ## 1. Obtain the code
-Download the code from GitHub
+Download the code from GitHub (to make git submodule work user has to do the git clone to download the code)
 ```
 git clone git@github.com:LLNL/ddcMD.git
 ```
