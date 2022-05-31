@@ -14,10 +14,10 @@ set(VERSION_STRING ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 enable_language(C CXX)
 message(STATUS "Compiler is ${CMAKE_CXX_COMPILER_ID}")
 
-option(USE_GPU  "Build on GPU" ON)
+option(USE_GPU  "Build on GPU" OFF)
 
-set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 set(CMAKE_C_STANDARD 99)

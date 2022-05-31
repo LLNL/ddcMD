@@ -954,7 +954,7 @@ int getCGLJindexbySpecie(SPECIES* specie, CHARMM_PARMS *charmmParms)
 
 
     //int index=0;
-    char resName[5];
+    char resName[10];
 
     char* specieStr = specie->name;
 

@@ -219,6 +219,14 @@ void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
     etot += parms->bioEnergies.cmap;
     etot += parms->bioEnergies.bpair;
 
+    printf("bond %8f, angle %8f, torsion %8f, impr %8f, bpair %8f\n",
+           parms->bioEnergies.bond,
+           parms->bioEnergies.angle,
+           parms->bioEnergies.torsion,
+           parms->bioEnergies.impr,
+           parms->bioEnergies.bpair
+    );
+
     e->eion += etot;
 
 

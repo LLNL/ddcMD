@@ -1,6 +1,12 @@
 #ifndef BIOMMFF_H
 #define BIOMMFF_H
 
+enum VSITETYPE
+{
+    VSITE3,
+    VSITE3OUT,
+};
+
 typedef struct massparms_st
 {
     char *name;
@@ -153,6 +159,28 @@ typedef struct torsparms_st
    
 } TORSPARMS;
 
+typedef struct vsiteparms_st
+{
+    char *name;
+    char *objclass;
+    char *value;
+    char *type;		/* model */
+    void *parent;
+
+    char *vtypestr;
+    enum VSITETYPE vtype;
+    int index;
+    int atom1;
+    int atom2;
+    int atom3;
+    int atom4;
+    double a;
+    double b;
+    double c;
+
+
+} VSITEPARMS;
+
 typedef struct resiparms_st
 {
    char *name;		
@@ -171,13 +199,15 @@ typedef struct resiparms_st
    int nExclude;
    int nAngles;
    int nTors;
+   int nVsite;
    GROUPPARMS** groupList;
    BONDPARMS** bondList;
    CONSLISTPARMS** consList;
    EXCLUDEPARMS** exclusionList;
    ANGLEPARMS** angleList;
    TORSPARMS** torsList;
-   
+   VSITEPARMS** vsiteList;
+
 } RESIPARMS;
 
 RESIPARMS *resiparms_init(void *parent, char *name);

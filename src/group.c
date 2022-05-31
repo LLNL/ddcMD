@@ -19,6 +19,7 @@ static char *emptyString = "";
 static void badGroupTypeError(const char* name, const char* type);
 
 void free_parms(GROUP *);
+void vsite_parms(GROUP *);
 void langevin_parms(GROUP *);
 void relativisticLangevin_parms(GROUP *);
 void TNBurn_parms(GROUP *);
@@ -76,6 +77,7 @@ GROUP *group_init(void *parent,char *name)
 	if (strcmp(type, "FIXEDVELOCITY") == 0) fixedVelocity_parms(gp); 
 	if (strcmp(type, "RELATIVISTIC") == 0) relativistic_parms(gp); 
 	if (strcmp(type, "FREE") == 0) free_parms(gp);
+    if (strcmp(type, "VSITE") == 0) vsite_parms(gp);
 	if (strcmp(type, "FROZEN") == 0) frozen_parms(gp);
 	if (strcmp(type, "IONIZATION") == 0) ionization_parms(gp); 
 	if (strcmp(type, "LANGEVIN") == 0) langevin_parms(gp);

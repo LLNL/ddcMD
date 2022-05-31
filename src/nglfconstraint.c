@@ -192,8 +192,7 @@ void resMoveConsOld(int consListSize, CONSTRAINT **consList, double dt, STATE* s
         int numAtm = constraint->numAtom; // total number of atom
         double rMass[numAtm];
         THREE_VECTOR r[numAtm], v[numAtm];
-        for (int j = 0; j < numAtm; ++j)
-        {
+        for (int j = 0; j < numAtm; ++j) {
             int index = resRangeStart + constraint->atomIDList[j];
             rMass[j] = 1.0 / ((ATOMTYPE_PARMS *) (state->species[index]->parm))->mass;
             VSET(r[j], state->rx[index], state->ry[index], state->rz[index]);
@@ -241,6 +240,7 @@ void resMoveConsOld(int consListSize, CONSTRAINT **consList, double dt, STATE* s
                 break;
             }
         } //end of iterative loop
+
         if (it == maxit) printf("%d resMove: too many contraint iterations.\n", getRank(0));
         *sion = szero;
         for (int ab = 0; ab < numPair; ++ab)

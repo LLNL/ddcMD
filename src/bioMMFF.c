@@ -1,3 +1,4 @@
+#include <string.h>
 #include "bioMMFF.h"
 #include "object.h"
 #include "ddcMalloc.h"
@@ -150,6 +151,30 @@ TORSPARMS *torsparms_init(void *parent, char *name)
 
 }
 
+VSITEPARMS *vsiteparms_init(void *parent, char *name)
+{
+    VSITEPARMS *vsitesparms;
+    vsitesparms = (VSITEPARMS *) object_initialize(name, "VSITEPARMS", sizeof (VSITEPARMS));
+
+    object_get((OBJECT *) vsitesparms, "index", &(vsitesparms->index), INT, 1, "0");
+    object_get((OBJECT *) vsitesparms, "atom1", &(vsitesparms->atom1), INT, 1, "0");
+    object_get((OBJECT *) vsitesparms, "atom2", &(vsitesparms->atom2), INT, 1, "0");
+    object_get((OBJECT *) vsitesparms, "atom3", &(vsitesparms->atom3), INT, 1, "0");
+    object_get((OBJECT *) vsitesparms, "atom4", &(vsitesparms->atom4), INT, 1, "0");
+    object_get((OBJECT *) vsitesparms, "a", &(vsitesparms->a), DOUBLE, 1, "0");
+    object_get((OBJECT *) vsitesparms, "b", &(vsitesparms->b), DOUBLE, 1, "0");
+    object_get((OBJECT *) vsitesparms, "c", &(vsitesparms->c), DOUBLE, 1, "0");
+    object_get((OBJECT *) vsitesparms, "type", &(vsitesparms->vtypestr), STRING, 1, "NoType");
+
+    if (strcmp(vsitesparms->vtypestr, "VSITE3") == 0){
+        vsitesparms->vtype=VSITE3;
+    }else if(strcmp(vsitesparms->vtypestr, "VSITE3OUT") == 0){
+        vsitesparms->vtype=VSITE3OUT;
+    }
+
+    return vsitesparms;
+}
+
 RESIPARMS *resiparms_init(void *parent, char *name)
 {
     RESIPARMS *resiparms;
@@ -214,6 +239,15 @@ RESIPARMS *resiparms_init(void *parent, char *name)
     {
         //printf("%s\n", torsNames[i]);
         resiparms->torsList[i] = torsparms_init(resiparms, torsNames[i]);
+    }
+
+    char** vsiteNames;
+    resiparms->nVsite = object_getv((OBJECT *) resiparms, "vsiteList", (void *) &vsiteNames, STRING, IGNORE_IF_NOT_FOUND);;
+    resiparms->vsiteList = (VSITEPARMS**) ddcMalloc(resiparms->nVsite * sizeof (VSITEPARMS*));
+    for (int i = 0; i < resiparms->nVsite; i++)
+    {
+        //printf("%s\n", vsiteNames[i]);
+        resiparms->vsiteList[i] = vsiteparms_init(resiparms, vsiteNames[i]);
     }
 
     return resiparms;

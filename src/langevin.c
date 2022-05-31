@@ -90,8 +90,14 @@ static void *normalParse(GROUP *group)
    return parms; 
 }
 void langevin_velocityUpdate(int mode, int  k,GROUP *group, STATE *state, double time, double dt)
-{  
-   LANGEVIN_PARMS *p=group->parm ; 
+{
+    SPECIES **species = state->species;
+    double mass = ((ATOMTYPE_PARMS *) (species[k]->parm))->mass;
+    if(mass<0.000001) {
+        return;
+    }
+
+    LANGEVIN_PARMS *p=group->parm ;
    RANDOM *random=p->random; 
    void *randomParms = random_getParms(random, k); 
    double *vx = state->vx; 
@@ -100,8 +106,6 @@ void langevin_velocityUpdate(int mode, int  k,GROUP *group, STATE *state, double
    double *fx = state->fx; 
    double *fy = state->fy; 
    double *fz = state->fz; 
-   SPECIES **species = state->species; 
-   double mass = ((ATOMTYPE_PARMS *) (species[k]->parm))->mass;
 
    THREE_VECTOR   v = p->vcm; 
 

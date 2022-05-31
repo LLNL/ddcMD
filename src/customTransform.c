@@ -106,6 +106,7 @@ void thermalize_delta(TRANSFORM* transform)
 	for (unsigned ii=0; ii<nLocal; ++ii)
 	{
       double mass = ((ATOMTYPE_PARMS *)(state->species[ii]->parm))->mass;
+      if(mass<0.0000001) return;
 		THREE_VECTOR vi;
 		VSET(vi,  vx[ii], vy[ii], vz[ii]);
 		double scale = sqrt(3.0*kB*temperature/(mass*VSQ(vi)));

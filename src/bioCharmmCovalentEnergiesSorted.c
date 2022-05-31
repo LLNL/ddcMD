@@ -573,7 +573,7 @@ double resUreyBradleySorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, 
     return eubtot;
 }
 
-double resTorsionSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESRANGE* resRange, RESI_CONN* resiConn, ETYPE *e, BIOWEIGHTS* weights)
+double  resTorsionSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESRANGE* resRange, RESI_CONN* resiConn, ETYPE *e, BIOWEIGHTS* weights)
 {
 
     double etorstot = 0;
