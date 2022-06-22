@@ -7,6 +7,7 @@
 #include "bioCharmmPar.h"
 #include "bioCharmmTop.h"
 #include "bioTransform.h"
+#include "vsiteType.h"
 #include "gid.h"
 
 #define HYDROGENMASSCUTOFF 2.35 //Use 1.1 for hydrogen mass cutoff
@@ -21,6 +22,12 @@ typedef struct charmmlj_struct
     double shift;
 }  CharmmLJ_PARMS;
  */
+
+typedef struct res_range_struct
+{
+    int start;
+    int end;
+} RESRANGE;
 
 enum EXCLUDEPOTENIALTERMS
 {
@@ -188,6 +195,22 @@ typedef struct impr_conn_str
     IMPROPER_PARMS *imprPtr;
 } IMPR_CONN;
 
+typedef struct vsite_conn_str
+{
+    int atom1;
+    int atom2;
+    int atom3;
+    int atom4;
+
+    enum VSITETYPE vtype;
+    int index;
+    double a;
+    double b;
+    double c;
+
+    //VSITE_PARMS *vsitePtr;
+} VSITE_CONN;
+
 typedef struct bpair_conn_str
 {
     int atmI;
@@ -291,6 +314,7 @@ typedef struct resi_conn_str
     int rebangleListSize;
     int torsListSize;
     int imprListSize;
+    int vsiteListSize;
     int bpairListSize;
     int cmapListSize;
     int weightListSize;
@@ -313,6 +337,7 @@ typedef struct resi_conn_str
     ANGLE_CONN** rebangleList;
     TORS_CONN** torsList;
     IMPR_CONN** imprList;
+    VSITE_CONN** vsiteList;
     BPAIR_CONN** bpairList;
     CMAP_CONN** cmapList;
 
@@ -436,6 +461,8 @@ typedef struct charmpot_parms_str
     int * isResidueOwnerSpecies; //this array is not used if above flag is set to 0 (false  
     SPECIESINFO *speciesInfo;
     GID_ORDER *gidOrder;
+    GID_ORDER *gidOrder2;
+    RESRANGE *resRange2;
     SETLIST residueSet;
     STATE statechpad;
     int weightedCharmm;
@@ -450,6 +477,7 @@ typedef struct charmpot_parms_str
     double(*bpair_fcn)(void *, void *, int, void*, void *, void *, void *, double*, double*, void *);
     double(*cmap_fcn)(void *, void *, void *, int, int, void *, void *, void *);
     int excludePotentialTerm;
+    int use_vsite;
 
 } CHARMMPOT_PARMS;
 

@@ -5,6 +5,7 @@
 #include "bioCharmm.h"
 #include "bioCharmmParms.h"
 #include "bioCharmmCovalent.h"
+#include "bioMMFF.h"
 #include "energyInfo.h"
 #include "expandbuffer.h"
 #include "ddc.h"
@@ -765,6 +766,10 @@ double resImproperSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RES
 
             IMPROPER_PARMS* imprPtr = imprConn->imprPtr;
             double imprDelta = impr - imprPtr->psi0;
+            if(imprDelta>M_PI)
+            {
+                imprDelta -= 2*M_PI;
+            }
             double eimpr = imprPtr->kpsi * imprDelta*imprDelta;
             eimprtot = eimprtot + eimpr;
             if (eimpr > 0.1)
@@ -964,6 +969,7 @@ double resCGBpairSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESR
             BPAIR_CONN* bpairConn = bpairList[bpairIndex];
             int indexI = resRange->start + (bpairConn->atmI);
             int indexJ = resRange->start + (bpairConn->atmJ);
+            //printf("BPair %d - %d \n", indexI, indexJ);
             if (gidOrder[indexI].id >= (int) nlocal)
             {
                 continue;
@@ -1007,7 +1013,7 @@ double resCGBpairSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESR
             double dedr = -epseduo * ir2;
             *ebele += ebelec;
 
-
+            //printf("BPair %d - %d  E_LJ = %f  E_ele = %f\n", indexI, indexJ, ebpair, ebelec);
             // Force
             THREE_VECTOR unit_ij;
             //bioUnit(state, indexI, indexJ, &unit_ij);

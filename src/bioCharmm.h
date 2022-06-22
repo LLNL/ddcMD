@@ -5,11 +5,7 @@
 #include "bioCharmmParms.h"
 #include "bioCharmmPar.h"
 
-typedef struct res_range_struct
-{
-    int start;
-    int end;
-} RESRANGE;
+
 
 int compare(const void * a, const void * b);
 

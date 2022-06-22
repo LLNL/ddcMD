@@ -27,6 +27,7 @@
 #include "accelerator.h"
 #include "simulate.h"
 #include "HAVEGPU.h"
+#include "expandbuffer.h"
 
 /* Single precision accuracy */
 #define FLOAT_EPS    1e-08
@@ -293,9 +294,13 @@ CHARMMPOT_PARMS *charmm_parms(POTENTIAL *potential)
     }
     parms->parms = (void*) ljParms;
 
-
+    int incr = 4096;
     object_get((OBJECT*) potential, "rmax4all", &(parms->rmax4all), DOUBLE, 1, "6.0");
     parms->gidOrder = NULL;
+    parms->gidOrder2 = NULL;
+    parms->gidOrder2 = ExpandBuffers((void*) parms->gidOrder2, sizeof (GID_ORDER), 1, incr, LOCATION("charmm_parms"), "parms->gidOrder2");
+    parms->resRange2 = NULL;
+    parms->resRange2 = ExpandBuffers((void*) parms->resRange2, sizeof (RESRANGE), 1, incr, LOCATION("charmm_parms"), "parms->resRange2");
     parms->residueSet.list = NULL;
     parms->residueSet.molSize = 0;
     parms->residueSet.listSize = 0;

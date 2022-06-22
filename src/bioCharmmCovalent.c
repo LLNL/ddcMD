@@ -12,6 +12,7 @@
 #include "gid.h"
 #include "units.h"
 #include "mpiUtils.h"
+#include "vsite.h"
 
 int compare(const void * a, const void * b);
 
@@ -92,9 +93,9 @@ void charmmResidues(SYSTEM*sys, CHARMMPOT_PARMS *parms)
     residueSet->listSize = listSize;
 }
 
-void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
+void charmmSetup(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
 {
-    profile(CHARMM_COVALENT, START);
+
     charmmResidues(sys, parms);
     SETLIST *residueSet = &parms->residueSet;
     LISTNODE* residueList = residueSet->list;
@@ -103,7 +104,8 @@ void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
     unsigned nion = sys->nion;
 
 
-    GID_ORDER gidOrder2[residueSet->molSize];
+    //GID_ORDER gidOrder2[residueSet->molSize];
+    parms->gidOrder2 = ExpandBuffers((void*) parms->gidOrder2, sizeof (GID_ORDER), residueSet->molSize, incr, LOCATION("charmmSetup"), "parms->gidOrder2");
     GID_ORDER *gidOrder = parms->gidOrder;
 
     unsigned partialNion = residueSet->molSize;
@@ -136,7 +138,7 @@ void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
     int sp_id = 0;
     for (int i = nion; i < residueSet->molSize; i++)
     {
-        gidOrder2[i].id = INT_MAX; //this will be removed in next commit. see note below on why we set gid to this high number. 
+        parms->gidOrder2[i].id = INT_MAX; //this will be removed in next commit. see note below on why we set gid to this high number.
         statechpad->label[i] = INT_MAX;
         ;
     }
@@ -168,7 +170,7 @@ void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
                 statechpad->fy[sp_id] = state->fy[s_id];
                 statechpad->fz[sp_id] = state->fz[s_id];
                 statechpad->species[sp_id] = state->species[s_id];
-                gidOrder2[sp_id].id = gidOrder[index].id;
+                parms->gidOrder2[sp_id].id = gidOrder[index].id;
                 index++;
             }
             else
@@ -178,22 +180,29 @@ void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
                 //but we can just use the exists array mentioned below
                 //this will be removed in next commit
                 statechpad->label[sp_id] = INT_MAX;
-                gidOrder2[sp_id].id = INT_MAX;
+                parms->gidOrder2[sp_id].id = INT_MAX;
             }
             sp_id++;
         }
     }
 
     //RESRANGE resRangeTmp[count];
-    RESRANGE resRange2[residueSet->listSize];
+    //RESRANGE resRange2[residueSet->listSize];
+    parms->resRange2 = ExpandBuffers((void*) parms->resRange2, sizeof (RESRANGE), residueSet->listSize, incr, LOCATION("charmmSetup"), "parms->resRange2");
+
     unsigned start = 0;
     for (int i = 0; i < residueSet->listSize; i++)
     {
-        resRange2[i].start = start;
+        parms->resRange2[i].start = start;
         start += residueList[i].size;
-        resRange2[i].end = start;
+        parms->resRange2[i].end = start;
     }
 
+}
+
+void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
+{
+    profile(CHARMM_COVALENT, START);
     /*
         //read weights?
         if(parms->weightedCharmm){
@@ -201,14 +210,31 @@ void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
             updateWeights(parms->charmmParms->charmmWeights);
         } 
      */
+    if(!parms->use_vsite){
+        charmmSetup(sys, parms, e);
+    }
+    STATE* state = sys->collection->state;
+    SETLIST *residueSet = &parms->residueSet;
+    LISTNODE* residueList = residueSet->list;
+    STATE *statechpad = &(parms->statechpad);
 
     BIOENERGIES bioEnergiesZero = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     parms->bioEnergies = bioEnergiesZero;
 
+    /*
+    if(parms->use_vsite)
+    {
+        for (int i = 0; i < residueSet->listSize; i++)
+        {
+            vsite_construction(statechpad, parms->gidOrder2, sys->nlocal, residueSet->molSize, residueList[i].name, parms->resRange2[i], parms);
+        }
+    }
+     */
+
     profile(CHARMM_CONNECTIVE, START);
     for (int i = 0; i < residueSet->listSize; i++)
     {
-        connectiveEnergy(statechpad, gidOrder2, sys->nlocal, residueSet->molSize, residueList[i].name, &resRange2[i], parms, e);
+        connectiveEnergy(statechpad, parms->gidOrder2, sys->nlocal, residueSet->molSize, residueList[i].name, &(parms->resRange2[i]), parms, e);
     }
     double etot = 0.0;
     etot += parms->bioEnergies.bond;
@@ -219,28 +245,35 @@ void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
     etot += parms->bioEnergies.cmap;
     etot += parms->bioEnergies.bpair;
 
-    printf("bond %8f, angle %8f, torsion %8f, impr %8f, bpair %8f\n",
-           parms->bioEnergies.bond,
-           parms->bioEnergies.angle,
-           parms->bioEnergies.torsion,
-           parms->bioEnergies.impr,
-           parms->bioEnergies.bpair
-    );
+    //printf("bond %8f, angle %8f, torsion %8f, impr %8f, bpair %8f\n",
+    //       parms->bioEnergies.bond,
+    //       parms->bioEnergies.angle,
+    //       parms->bioEnergies.torsion,
+    //       parms->bioEnergies.impr,
+    //       parms->bioEnergies.bpair
+    //);
 
     e->eion += etot;
 
+    /*
+    if(parms->use_vsite) {
+        for (int i = 0; i < residueSet->listSize; i++) {
+            vsite_force(statechpad, parms->gidOrder2, sys->nlocal, residueSet->molSize, residueList[i].name, parms->resRange2[i], parms);
+        }
+    }
+     */
 
     profile(CHARMM_CONNECTIVE, END);
 
     // Update the force to ddc items 
     // May not need to update coordinates.
     // transfer state from padded sorted state array to system state array
-    index = 0;
+    //index = 0;
     for (int i = 0; i < residueSet->molSize; i++)
     {
         //if (statechpad->label[i] == INT_MAX) {continue;};
         //if (gidOrder2[i].id == INT_MAX) {continue;};
-        unsigned index = gidOrder2[i].id;
+        unsigned index = parms->gidOrder2[i].id;
         if (index > sys->nion)
         {
             continue;

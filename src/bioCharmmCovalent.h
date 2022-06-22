@@ -36,6 +36,7 @@ void charmmResidues(SYSTEM*sys, CHARMMPOT_PARMS *parms);
 }
 #endif
 
+void charmmSetup(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e);
 
 int resNameDiffer(char* resName, char *name);
 double resBondSorted(STATE* state, GID_ORDER* gidOrder, int nlocal, int ntotal, RESRANGE* resRange, RESI_CONN* resiConn, ETYPE *e, BIOWEIGHTS* weights);
@@ -45,6 +46,7 @@ double resAngleRestrainSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal
 double resUreyBradleySorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESRANGE* resRange, RESI_CONN* resiConn, ETYPE *e, BIOWEIGHTS* weights);
 double resTorsionSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESRANGE* resRange, RESI_CONN* resiConn, ETYPE *e, BIOWEIGHTS* weights);
 double resImproperSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESRANGE* resRange, RESI_CONN* resiConn, ETYPE *e, BIOWEIGHTS* weights);
+double resVsiteSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESRANGE* resRange, RESI_CONN* resiConn, ETYPE *e, BIOWEIGHTS* weights);
 double resBondSortedWeighted(STATE* state, GID_ORDER* gidOrder, int nlocal, int ntotal, RESRANGE* resRange, RESI_CONN* resiConn, ETYPE *e, BIOWEIGHTS* weights);
 double resAngleSortedWeighted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESRANGE* resRange, RESI_CONN* resiConn, ETYPE *e, BIOWEIGHTS* weights);
 double resUreyBradleySortedWeighted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESRANGE* resRange, RESI_CONN* resiConn, ETYPE *e, BIOWEIGHTS* weights);

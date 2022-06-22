@@ -1,11 +1,7 @@
 #ifndef BIOMMFF_H
 #define BIOMMFF_H
 
-enum VSITETYPE
-{
-    VSITE3,
-    VSITE3OUT,
-};
+#include "vsiteType.h"
 
 typedef struct massparms_st
 {
@@ -174,6 +170,10 @@ typedef struct vsiteparms_st
     int atom2;
     int atom3;
     int atom4;
+    char *atomType1;
+    char *atomType2;
+    char *atomType3;
+    char *atomType4;
     double a;
     double b;
     double c;

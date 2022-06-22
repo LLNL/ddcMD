@@ -415,7 +415,7 @@ double resImproperNormal(STATE* state, GID_ORDER* gidOrder, int nlocal, int ntot
         double imprDelta = impr - imprPtr->psi0;
         double eimpr = imprPtr->kpsi * imprDelta*imprDelta;
         eimprtot = eimprtot + eimpr;
-        if (eimpr > 0.1)
+        if (eimpr > 0.0)
         {
             printf("I=%d J=%d K=%d L=%d\n", indexI, indexJ, indexK, indexL);
             printf("Improper =%f Improper angle=%f kpsi=%f psi0=%f Improper Energy=%f\n",

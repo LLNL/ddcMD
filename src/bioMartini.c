@@ -24,6 +24,8 @@
 #include "bioGid.h"
 #include "accelerator.h"
 #include "HAVEGPU.h"
+#include "vsite.h"
+#include "expandbuffer.h"
 
 RESI_CONN* findResiConnNew(CHARMM_PARMS* charmmParms, char* name);
 void reOrgPairs(SYSTEM*sys, CHARMMPOT_PARMS *parms);
@@ -129,7 +131,145 @@ void validateExclusions(MMFF *mmff)
                 }
             }
         }
+
+        for(int v = 0; v< resiParm->nVsite; v++)
+        {
+            VSITEPARMS *visteparms = resiParm->vsiteList[v];
+
+            for (int e = 0; e < resiParm->nExclude; e++) {
+                EXCLUDEPARMS *excludeparms = resiParm->exclusionList[e];
+                if (excludeparms->valid == 1) {
+                    switch (visteparms->vtype) {
+                        case VSITE1:
+                            if(visteparms->atom1==excludeparms->atomI && visteparms->atom2==excludeparms->atomJ)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomJ && visteparms->atom2==excludeparms->atomI)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            break;
+                        case VSITE2:
+                        case VSITE2FD:
+                            if(visteparms->atom1==excludeparms->atomI && visteparms->atom2==excludeparms->atomJ)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomJ && visteparms->atom2==excludeparms->atomI)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomI && visteparms->atom3==excludeparms->atomJ)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomJ && visteparms->atom3==excludeparms->atomI)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            break;
+                        case VSITE3:
+                        case VSITE3FD:
+                        case VSITE3FAD:
+                        case VSITE3OUT:
+                            if(visteparms->atom1==excludeparms->atomI && visteparms->atom2==excludeparms->atomJ)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomJ && visteparms->atom2==excludeparms->atomI)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomI && visteparms->atom3==excludeparms->atomJ)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomJ && visteparms->atom3==excludeparms->atomI)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomI && visteparms->atom4==excludeparms->atomJ)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomJ && visteparms->atom4==excludeparms->atomI)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+
+                            break;
+                        case VSITE4FD:
+                        case VSITE4FDN:
+                        case VSITEN:
+                            if(visteparms->atom1==excludeparms->atomI && visteparms->atom2==excludeparms->atomJ)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomJ && visteparms->atom2==excludeparms->atomI)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomI && visteparms->atom3==excludeparms->atomJ)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomJ && visteparms->atom3==excludeparms->atomI)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomI && visteparms->atom4==excludeparms->atomJ)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomJ && visteparms->atom4==excludeparms->atomI)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+
     }
+}
+
+void setMartiniLJ(MMFF *mmff, BPAIR_CONN **bpairPtrs, int* bpairTotalSize, int* bpairSize, int atomI, int atomJ, char* atomTypeI, char* atomTypeJ)
+{
+    bpairPtrs[*bpairTotalSize]->atmI = atomI;
+    bpairPtrs[*bpairTotalSize]->atmJ = atomJ;
+    double eps = 0;
+    double sigma = 0;
+    if (getMartiniLJpairParm(mmff, atomTypeI, atomTypeJ, &eps, &sigma) < 0)
+    {
+        char message[80];
+        sprintf(message, "Martini BondPair error: Not able to find LJ parameter %s - %s \n", atomTypeI, atomTypeJ);
+        error_action(message, ERROR_IN("Martini BondPair", ABORT));
+    }
+    bpairPtrs[*bpairTotalSize]->eps = eps;
+    bpairPtrs[*bpairTotalSize]->sigma = sigma;
+
+    ++(*bpairSize);
+    ++(*bpairTotalSize);
 }
 
 int genMartiniBondPair(CHARMM_PARMS* charmmParms, MMFF *mmff)
@@ -175,6 +315,30 @@ int genMartiniBondPair(CHARMM_PARMS* charmmParms, MMFF *mmff)
                 }
             }
         }
+
+        for(int v = 0; v< resiParm->nVsite; v++)
+        {
+            switch(resiParm->vsiteList[v]->vtype) {
+                case VSITE1:
+                    bpairTotalSize++;
+                    break;
+                case VSITE2:
+                case VSITE2FD:
+                    bpairTotalSize += 2;
+                    break;
+                case VSITE3:
+                case VSITE3FD:
+                case VSITE3FAD:
+                case VSITE3OUT:
+                    bpairTotalSize += 3;
+                    break;
+                case VSITE4FD:
+                case VSITE4FDN:
+                case VSITEN:
+                    bpairTotalSize += 4;
+                    break;
+            }
+        }
     }
 
     BPAIR_CONN *bpairHeap = ddcMalloc(bpairTotalSize * sizeof (BPAIR_CONN));
@@ -198,25 +362,7 @@ int genMartiniBondPair(CHARMM_PARMS* charmmParms, MMFF *mmff)
             BONDPARMS* bondparms = resiParm->bondList[i];
             if (bondparms->func == 1)
             {
-                bpairPtrs[bpairTotalSize]->atmI = bondparms->atomI;
-                bpairPtrs[bpairTotalSize]->atmJ = bondparms->atomJ;
-                char* atmTypeI = bondparms->atomTypeI;
-                char* atmTypeJ = bondparms->atomTypeJ;
-                double eps = 0.0;
-                double sigma = 0.0;
-                if (getMartiniLJpairParm(mmff, atmTypeI, atmTypeJ, &eps, &sigma) < 0)
-                {
-                    char message[80];
-                    sprintf(message, "Martini BondPair error: Not able to find LJ parameter %s - %s \n", atmTypeI, atmTypeJ);
-                    error_action(message, ERROR_IN("Martini BondPair", ABORT));
-                }
-                bpairPtrs[bpairTotalSize]->eps = eps;
-                bpairPtrs[bpairTotalSize]->sigma = sigma;
-                // Default no potential shift
-                bpairPtrs[bpairTotalSize]->shift = 0.0;
-
-                ++bpairSize;
-                ++bpairTotalSize;
+                setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, bondparms->atomI, bondparms->atomJ, bondparms->atomTypeI, bondparms->atomTypeJ);
             }
         }
 
@@ -225,23 +371,7 @@ int genMartiniBondPair(CHARMM_PARMS* charmmParms, MMFF *mmff)
             EXCLUDEPARMS* excludeparms = resiParm->exclusionList[e];
             if (excludeparms->valid == 1)
             {
-                bpairPtrs[bpairTotalSize]->atmI = excludeparms->atomI;
-                bpairPtrs[bpairTotalSize]->atmJ = excludeparms->atomJ;
-                char* atmTypeI = excludeparms->atomTypeI;
-                char* atmTypeJ = excludeparms->atomTypeJ;
-                double eps = 0;
-                double sigma = 0;
-                if (getMartiniLJpairParm(mmff, atmTypeI, atmTypeJ, &eps, &sigma) < 0)
-                {
-                    char message[80];
-                    sprintf(message, "Martini BondPair error: Not able to find LJ parameter %s - %s \n", atmTypeI, atmTypeJ);
-                    error_action(message, ERROR_IN("Martini BondPair", ABORT));
-                }
-                bpairPtrs[bpairTotalSize]->eps = eps;
-                bpairPtrs[bpairTotalSize]->sigma = sigma;
-
-                ++bpairSize;
-                ++bpairTotalSize;
+                setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, excludeparms->atomI, excludeparms->atomJ, excludeparms->atomTypeI, excludeparms->atomTypeJ);
             }
         }
 
@@ -253,24 +383,38 @@ int genMartiniBondPair(CHARMM_PARMS* charmmParms, MMFF *mmff)
                 CONSPARMS* consparms = conslistparms->consSubList[s];
                 if (consparms->valid == 1)
                 {
-                    bpairPtrs[bpairTotalSize]->atmI = consparms->atomI;
-                    bpairPtrs[bpairTotalSize]->atmJ = consparms->atomJ;
-                    char* atmTypeI = consparms->atomTypeI;
-                    char* atmTypeJ = consparms->atomTypeJ;
-                    double eps = 0;
-                    double sigma = 0;
-                    if (getMartiniLJpairParm(mmff, atmTypeI, atmTypeJ, &eps, &sigma) < 0)
-                    {
-                        char message[80];
-                        sprintf(message, "Martini BondPair error: Not able to find LJ parameter %s - %s \n", atmTypeI, atmTypeJ);
-                        error_action(message, ERROR_IN("Martini BondPair", ABORT));
-                    }
-                    bpairPtrs[bpairTotalSize]->eps = eps;
-                    bpairPtrs[bpairTotalSize]->sigma = sigma;
-
-                    ++bpairSize;
-                    ++bpairTotalSize;
+                    setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, consparms->atomI, consparms->atomJ, consparms->atomTypeI, consparms->atomTypeJ);
                 }
+            }
+        }
+
+        for(int v = 0; v< resiParm->nVsite; v++)
+        {
+            VSITEPARMS *visteparms = resiParm->vsiteList[v];
+            switch(visteparms->vtype) {
+                case VSITE1:
+                    setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom2, visteparms->atomType1, visteparms->atomType2);
+                    break;
+                case VSITE2:
+                case VSITE2FD:
+                    setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom2, visteparms->atomType1, visteparms->atomType2);
+                    setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom3, visteparms->atomType1, visteparms->atomType3);
+                    break;
+                case VSITE3:
+                case VSITE3FD:
+                case VSITE3FAD:
+                case VSITE3OUT:
+                    setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom2, visteparms->atomType1, visteparms->atomType2);
+                    setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom3, visteparms->atomType1, visteparms->atomType3);
+                    setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom4, visteparms->atomType1, visteparms->atomType4);
+                    break;
+                case VSITE4FD:
+                case VSITE4FDN:
+                case VSITEN:
+                    setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom2, visteparms->atomType1, visteparms->atomType2);
+                    setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom3, visteparms->atomType1, visteparms->atomType3);
+                    setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom4, visteparms->atomType1, visteparms->atomType4);
+                    break;
             }
         }
 
@@ -816,6 +960,27 @@ int genMartiniConn(CHARMM_PARMS *charmmParms, MMFF *mmff)
             }
         }
 
+        int nVsite=resiParm->nVsite;
+        resiConn->vsiteListSize=nVsite;
+        if(resiConn->vsiteListSize>0)
+        {
+            VSITE_CONN* vsiteConnStack = ddcMalloc(nVsite * sizeof (VSITE_CONN));
+            resiConn->vsiteList = ddcMalloc(nVsite * sizeof (VSITE_CONN*));
+            for (int j = 0; j < resiParm->nVsite; j++)
+            {
+                resiConn->vsiteList[j] = &vsiteConnStack[j];
+                resiConn->vsiteList[j]->atom1 = resiParm->vsiteList[j]->atom1;
+                resiConn->vsiteList[j]->atom2 = resiParm->vsiteList[j]->atom2;
+                resiConn->vsiteList[j]->atom3 = resiParm->vsiteList[j]->atom3;
+                resiConn->vsiteList[j]->atom4 = resiParm->vsiteList[j]->atom4;
+                resiConn->vsiteList[j]->a = resiParm->vsiteList[j]->a;
+                resiConn->vsiteList[j]->b = resiParm->vsiteList[j]->b;
+                resiConn->vsiteList[j]->c = resiParm->vsiteList[j]->c;
+                resiConn->vsiteList[j]->vtype = resiParm->vsiteList[j]->vtype;
+                resiConn->vsiteList[j]->index = resiParm->vsiteList[j]->index;
+            }
+        }
+
         // The rest lists are set to 0
         resiConn->cmapListSize = 0;
         resiConn->cmapList = NULL;
@@ -1048,6 +1213,7 @@ void martiniNonBond(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
         while (pij != NULL)
         {
             int j = pij->j;
+            //printf("LJ  %d - %d\n", i, j);
             int sj = sIndex[j];
             int sij = sj + nspecies*si;
             //double rcut = parms->rcut[sij].value;
@@ -1076,6 +1242,8 @@ void martiniNonBond(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
                 double s6 = s4*s2;
                 double s12 = s6*s6;
                 vLJ += 4.0 * eps * (s12 - s6) + ljparms->shift;
+
+                //printf("LJ  %d - %d distance = %f  E_LJ = %f\n", i, j, sqrt(r2), 4.0 * eps * (s12 - s6) + ljparms->shift);
                 //double vLJij =   4.0 * eps * (s12 - s6) + ljparms->shift;
                 double dvdr = 24.0 * eps * (s6 - 2.0 * s12) * ir2;
 
@@ -1158,6 +1326,7 @@ void martiniIntraMoleReaction(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
         while (pij != NULL)
         {
             int j = pij->j;
+            //printf("ELE  %d - %d\n", i, j);
             double x = xi - rx[j];
             double y = yi - ry[j];
             double z = zi - rz[j];
@@ -1171,6 +1340,7 @@ void martiniIntraMoleReaction(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
             {
                 double kqij = kqi * q[j];
                 vEle += kqij * (krf * r2 - crf);
+                //printf("ELE %d - %d  E_ele = %f\n", i, j, kqij * (krf * r2 - crf));
                 double dvdr = kqij * (2 * krf);
                 double fxij = -dvdr * x;
                 double fyij = -dvdr * y;
@@ -1215,6 +1385,7 @@ CHARMMPOT_PARMS *martini_parms(POTENTIAL *potential)
     char *parmfile;
     object_get((OBJECT *) potential, "parmfile", &parmfile, STRING, 1, "martini.data");
     object_get((OBJECT *) potential, "excludePotentialTerm", &parms->excludePotentialTerm, INT, 1, "0");
+    object_get((OBJECT *) potential, "use_vsite", &parms->use_vsite, INT, 1, "0");
 
     object_compilefile(parmfile);
 
@@ -1244,7 +1415,12 @@ CHARMMPOT_PARMS *martini_parms(POTENTIAL *potential)
         parms->crf = 1.5 * irc;
     }
 
+    int incr = 4096;
     parms->gidOrder = NULL;
+    parms->gidOrder2 = NULL;
+    parms->gidOrder2 = ExpandBuffers((void*) parms->gidOrder2, sizeof (GID_ORDER), 1, incr, LOCATION("charmm_parms"), "parms->gidOrder2");
+    parms->resRange2 = NULL;
+    parms->resRange2 = ExpandBuffers((void*) parms->resRange2, sizeof (RESRANGE), 1, incr, LOCATION("charmm_parms"), "parms->resRange2");
     parms->residueSet.list = NULL;
     parms->residueSet.molSize = 0;
     parms->residueSet.listSize = 0;
@@ -1319,7 +1495,8 @@ CHARMMPOT_PARMS *martini_parms(POTENTIAL *potential)
     parms->torsion_fcn = (double (*)(void *, void *, int, void *, void *, void *, void *))resTorsionSorted;
     parms->improper_fcn = (double (*)(void *, void *, int, void *, void *, void *, void *))resImproperSorted;
     parms->cmap_fcn = NULL;
-    parms->bpair_fcn = (double (*)(void *, void *, int, void *, void *, void *, void *, double *, double *, void *))resCGBpairSorted;
+    //parms->bpair_fcn = (double (*)(void *, void *, int, void *, void *, void *, void *, double *, double *, void *))resCGBpairSorted;
+    parms->bpair_fcn = NULL;
 
     if ((parms->excludePotentialTerm & bondMask) != 0) parms->bond_fcn = NULL;
     if ((parms->excludePotentialTerm & angleMask) != 0) parms->angle_fcn = NULL;
@@ -1360,6 +1537,12 @@ void martini(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
     //STATE *state=sys->collection->state;
     profile(CHARMM_T, START);
     parms->bioEnergies = bioEnergiesZero;
+
+    if(parms->use_vsite){
+        charmmSetup(sys, parms, e);
+        vsite_construction(sys, parms, e);
+    }
+
     if (sys->moleculeClass != NULL)
     {
         if (sys->neighbor->lastUpdate == sys->loop) reOrgPairs(sys, parms);
@@ -1369,7 +1552,7 @@ void martini(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
             martiniNonBond(sys, parms, e); // Nonbond interaction including LJ and ELE from Reaction Field/
             martiniIntraMoleReaction(sys, parms, e);
         }
-        parms->bpair_fcn = NULL;
+        //parms->bpair_fcn = NULL;
     }
     else
     {
@@ -1378,7 +1561,13 @@ void martini(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
             martiniNonBond(sys, parms, e); // Nonbond interaction including LJ and ELE from Reaction Field/
         }
     }
+
     charmmConvalent(sys, parms, e); //Calculate all bonded terms
+
+    if(parms->use_vsite) {
+        vsite_force(sys, parms, e);
+    }
+
     if (firstTime)
     {
         BIOENERGIES bioEnergies = parms->bioEnergies;
