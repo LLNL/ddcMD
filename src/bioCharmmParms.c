@@ -1933,6 +1933,19 @@ int compareCmap(const void *v1, const void *v2)
         return 0;
 }
 
+int compareVsite(const void *v1, const void *v2)
+{
+    const VSITE_CONN *u1 = (VSITE_CONN *) v1;
+    const VSITE_CONN *u2 = (VSITE_CONN *) v2;
+    //use N to compare
+    if (u1->atom1 < u2->atom1)
+        return -1;
+    else if (u1->atom1 > u2->atom1)
+        return 1;
+    else
+        return 0;
+}
+
 int compareWeight(const void *v1, const void *v2)
 {
     const ZEROWEIGHTS *u1 = (ZEROWEIGHTS *) v1;
@@ -1964,6 +1977,7 @@ void genAtmRange(CHARMM_PARMS* charmmParms)
             atmRange->imprRange.start = -1;
             atmRange->bpairRange.start = -1;
             atmRange->cmapRange.start = -1;
+            atmRange->vsiteRange.start = -1;
         }
 
         BOND_CONN* bondArray = 0;
@@ -1974,6 +1988,7 @@ void genAtmRange(CHARMM_PARMS* charmmParms)
         IMPR_CONN* imprArray = 0;
         BPAIR_CONN* bpairArray = 0;
         CMAP_CONN* cmapArray = 0;
+        VSITE_CONN* vsiteArray = 0;
 
         //Solute ions have list sizes = 0
         if (resiConn->bondListSize > 0)
@@ -1992,6 +2007,8 @@ void genAtmRange(CHARMM_PARMS* charmmParms)
             bpairArray = *(resiConn->bpairList);
         if (resiConn->cmapListSize > 0)
             cmapArray = *(resiConn->cmapList);
+        if(resiConn->vsiteListSize > 0)
+            vsiteArray = *(resiConn->vsiteList);
 
         if (resiConn->bondListSize > 0)
             qsort(bondArray, resiConn->bondListSize, sizeof (BOND_CONN), compareBond);
@@ -2017,6 +2034,8 @@ void genAtmRange(CHARMM_PARMS* charmmParms)
         if (resiConn->cmapListSize > 0)
             qsort(cmapArray, resiConn->cmapListSize, sizeof (CMAP_CONN), compareCmap);
 
+        if (resiConn->vsiteListSize > 0)
+            qsort(vsiteArray, resiConn->vsiteListSize, sizeof (VSITE_CONN), compareVsite);
         // Print out sorted array
         /*
         printf("Residue Name: %s  ID: %d  Nter: %d  Cter: %d\n", resiConn->resName, resiConn->resID, resiConn->nTer, resiConn->cTer);
@@ -2139,6 +2158,19 @@ void genAtmRange(CHARMM_PARMS* charmmParms)
                 atmRange->cmapRange.start = j;
             }
             atmRange->cmapRange.end = j + 1;
+            atomInd = atomI;
+        }
+
+        atomInd = -1;
+        for (int j = 0; j < resiConn->vsiteListSize; j++)
+        {
+            int atomI = resiConn->vsiteList[j]->atom1;
+            ATMRANGE* atmRange = resiConn->atmRanges[atomI];
+            if (atomInd != atomI)
+            {
+                atmRange->vsiteRange.start = j;
+            }
+            atmRange->vsiteRange.end = j + 1;
             atomInd = atomI;
         }
     }

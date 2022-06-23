@@ -259,6 +259,7 @@ typedef struct atmrange_str
     RANGE bpairRange;
     RANGE cmapRange;
     RANGE weightRange;
+    RANGE vsiteRange;
 
 } ATMRANGE;
 

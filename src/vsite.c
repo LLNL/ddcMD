@@ -163,30 +163,40 @@ void vsite_resdiue_construction(STATE* state, GID_ORDER* gidOrder, unsigned nloc
     CHARMM_PARMS* charmmParms = parms->charmmParms;
     RESI_CONN* resiConn = findResiConnNew(charmmParms, name);
 
-    for (int i = 0; i < resiConn->vsiteListSize; ++i) {
-        VSITE_CONN *vsiteConn=resiConn->vsiteList[i];
-        int index1 = resRange->start + vsiteConn->atom1;
-        int index2 = resRange->start + vsiteConn->atom2;
-        int index3 = resRange->start + vsiteConn->atom3;
-        int index4 = resRange->start + vsiteConn->atom4;
-
-        switch(vsiteConn->vtype)
+    //for (int i = 0; i < resiConn->vsiteListSize; ++i) {
+    //    VSITE_CONN *vsiteConn=resiConn->vsiteList[i];
+    VSITE_CONN **vsiteList = resiConn->vsiteList;
+    for (int i = 0; i < resiConn->atomListSize; ++i)
+    {
+        RANGE vsiteRange = resiConn->atmRanges[i]->vsiteRange;
+        if (vsiteRange.start == -1)
         {
-            case VSITE1:
-                coor_vsite1(state, vsiteConn, index1, index2);
-                break;
-            case VSITE2:
-                coor_vsite2(state, vsiteConn, index1, index2, index3);
-                break;
-            case VSITE2FD:
-                coor_vsite2fd(state, vsiteConn, index1, index2, index3);
-                break;
-            case VSITE3:
-                coor_vsite3(state, vsiteConn, index1, index2, index3, index4);
-                break;
-            case VSITE3OUT:
-                coor_vsite3out(state, vsiteConn, index1, index2, index3, index4);
-                break;
+            continue;
+        }
+        for (int vsiteIndex = vsiteRange.start; vsiteIndex < vsiteRange.end; vsiteIndex++) {
+            VSITE_CONN *vsiteConn = vsiteList[vsiteIndex];
+            int index1 = resRange->start + vsiteConn->atom1;
+            int index2 = resRange->start + vsiteConn->atom2;
+            int index3 = resRange->start + vsiteConn->atom3;
+            int index4 = resRange->start + vsiteConn->atom4;
+
+            switch (vsiteConn->vtype) {
+                case VSITE1:
+                    coor_vsite1(state, vsiteConn, index1, index2);
+                    break;
+                case VSITE2:
+                    coor_vsite2(state, vsiteConn, index1, index2, index3);
+                    break;
+                case VSITE2FD:
+                    coor_vsite2fd(state, vsiteConn, index1, index2, index3);
+                    break;
+                case VSITE3:
+                    coor_vsite3(state, vsiteConn, index1, index2, index3, index4);
+                    break;
+                case VSITE3OUT:
+                    coor_vsite3out(state, vsiteConn, index1, index2, index3, index4);
+                    break;
+            }
         }
 
     }
@@ -324,30 +334,40 @@ void vsite_residue_force(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, uns
     CHARMM_PARMS* charmmParms = parms->charmmParms;
     RESI_CONN* resiConn = findResiConnNew(charmmParms, name);
 
-    for (int i = 0; i < resiConn->vsiteListSize; ++i) {
-        VSITE_CONN *vsiteConn=resiConn->vsiteList[i];
-        int index1 = resRange->start + vsiteConn->atom1;
-        int index2 = resRange->start + vsiteConn->atom2;
-        int index3 = resRange->start + vsiteConn->atom3;
-        int index4 = resRange->start + vsiteConn->atom4;
-
-        switch(vsiteConn->vtype)
+    //for (int i = 0; i < resiConn->vsiteListSize; ++i) {
+    //    VSITE_CONN *vsiteConn=resiConn->vsiteList[i];
+    VSITE_CONN **vsiteList = resiConn->vsiteList;
+    for (int i = 0; i < resiConn->atomListSize; ++i)
+    {
+        RANGE vsiteRange = resiConn->atmRanges[i]->vsiteRange;
+        if (vsiteRange.start == -1)
         {
-            case VSITE1:
-                force_vsite1(state, vsiteConn, index1, index2);
-                break;
-            case VSITE2:
-                force_vsite2(state, vsiteConn, index1, index2, index3);
-                break;
-            case VSITE2FD:
-                force_vsite2fd(state, vsiteConn, index1, index2, index3);
-                break;
-            case VSITE3:
-                force_vsite3(state, vsiteConn, index1, index2, index3, index4);
-                break;
-            case VSITE3OUT:
-                force_vsite3out(state, vsiteConn, index1, index2, index3, index4);
-                break;
+            continue;
+        }
+        for (int vsiteIndex = vsiteRange.start; vsiteIndex < vsiteRange.end; vsiteIndex++) {
+            VSITE_CONN* vsiteConn = vsiteList[vsiteIndex];
+            int index1 = resRange->start + vsiteConn->atom1;
+            int index2 = resRange->start + vsiteConn->atom2;
+            int index3 = resRange->start + vsiteConn->atom3;
+            int index4 = resRange->start + vsiteConn->atom4;
+
+            switch (vsiteConn->vtype) {
+                case VSITE1:
+                    force_vsite1(state, vsiteConn, index1, index2);
+                    break;
+                case VSITE2:
+                    force_vsite2(state, vsiteConn, index1, index2, index3);
+                    break;
+                case VSITE2FD:
+                    force_vsite2fd(state, vsiteConn, index1, index2, index3);
+                    break;
+                case VSITE3:
+                    force_vsite3(state, vsiteConn, index1, index2, index3, index4);
+                    break;
+                case VSITE3OUT:
+                    force_vsite3out(state, vsiteConn, index1, index2, index3, index4);
+                    break;
+            }
         }
 
     }
