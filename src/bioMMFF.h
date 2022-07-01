@@ -170,10 +170,12 @@ typedef struct vsiteparms_st
     int atom2;
     int atom3;
     int atom4;
+    int atom5;
     char *atomType1;
     char *atomType2;
     char *atomType3;
     char *atomType4;
+    char *atomType5;
     double a;
     double b;
     double c;

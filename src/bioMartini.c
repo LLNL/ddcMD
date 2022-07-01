@@ -244,6 +244,16 @@ void validateExclusions(MMFF *mmff)
                                 excludeparms->valid = 0;
                                 break;
                             }
+                            if(visteparms->atom1==excludeparms->atomI && visteparms->atom5==excludeparms->atomJ)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
+                            if(visteparms->atom1==excludeparms->atomJ && visteparms->atom5==excludeparms->atomI)
+                            {
+                                excludeparms->valid = 0;
+                                break;
+                            }
                             break;
                     }
                 }
@@ -414,6 +424,7 @@ int genMartiniBondPair(CHARMM_PARMS* charmmParms, MMFF *mmff)
                     setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom2, visteparms->atomType1, visteparms->atomType2);
                     setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom3, visteparms->atomType1, visteparms->atomType3);
                     setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom4, visteparms->atomType1, visteparms->atomType4);
+                    setMartiniLJ(mmff, bpairPtrs, &bpairTotalSize, &bpairSize, visteparms->atom1, visteparms->atom5, visteparms->atomType1, visteparms->atomType5);
                     break;
             }
         }
@@ -973,6 +984,7 @@ int genMartiniConn(CHARMM_PARMS *charmmParms, MMFF *mmff)
                 resiConn->vsiteList[j]->atom2 = resiParm->vsiteList[j]->atom2;
                 resiConn->vsiteList[j]->atom3 = resiParm->vsiteList[j]->atom3;
                 resiConn->vsiteList[j]->atom4 = resiParm->vsiteList[j]->atom4;
+                resiConn->vsiteList[j]->atom5 = resiParm->vsiteList[j]->atom5;
                 resiConn->vsiteList[j]->a = resiParm->vsiteList[j]->a;
                 resiConn->vsiteList[j]->b = resiParm->vsiteList[j]->b;
                 resiConn->vsiteList[j]->c = resiParm->vsiteList[j]->c;
@@ -1538,8 +1550,8 @@ void martini(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
     profile(CHARMM_T, START);
     parms->bioEnergies = bioEnergiesZero;
 
+    charmmSetup(sys, parms, e);
     if(parms->use_vsite){
-        charmmSetup(sys, parms, e);
         vsite_construction(sys, parms, e);
     }
 

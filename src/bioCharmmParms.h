@@ -201,6 +201,7 @@ typedef struct vsite_conn_str
     int atom2;
     int atom3;
     int atom4;
+    int atom5;
 
     enum VSITETYPE vtype;
     int index;

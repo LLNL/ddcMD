@@ -210,9 +210,9 @@ void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
             updateWeights(parms->charmmParms->charmmWeights);
         } 
      */
-    if(!parms->use_vsite){
-        charmmSetup(sys, parms, e);
-    }
+    //if(!parms->use_vsite){
+    //    charmmSetup(sys, parms, e);
+    //}
     STATE* state = sys->collection->state;
     SETLIST *residueSet = &parms->residueSet;
     LISTNODE* residueList = residueSet->list;

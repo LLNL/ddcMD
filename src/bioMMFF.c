@@ -161,13 +161,15 @@ VSITEPARMS *vsiteparms_init(void *parent, char *name)
     object_get((OBJECT *) vsitesparms, "atom2", &(vsitesparms->atom2), INT, 1, "0");
     object_get((OBJECT *) vsitesparms, "atom3", &(vsitesparms->atom3), INT, 1, "0");
     object_get((OBJECT *) vsitesparms, "atom4", &(vsitesparms->atom4), INT, 1, "0");
+    object_get((OBJECT *) vsitesparms, "atom5", &(vsitesparms->atom5), INT, 1, "0");
     object_get((OBJECT *) vsitesparms, "atomType1", &(vsitesparms->atomType1), STRING, 1, "NoType");
     object_get((OBJECT *) vsitesparms, "atomType2", &(vsitesparms->atomType2), STRING, 1, "NoType");
     object_get((OBJECT *) vsitesparms, "atomType3", &(vsitesparms->atomType3), STRING, 1, "NoType");
     object_get((OBJECT *) vsitesparms, "atomType4", &(vsitesparms->atomType4), STRING, 1, "NoType");
+    object_get((OBJECT *) vsitesparms, "atomType5", &(vsitesparms->atomType5), STRING, 1, "NoType");
     object_get((OBJECT *) vsitesparms, "a", &(vsitesparms->a), DOUBLE, 1, "0");
     object_get((OBJECT *) vsitesparms, "b", &(vsitesparms->b), DOUBLE, 1, "0");
-    object_get((OBJECT *) vsitesparms, "c", &(vsitesparms->c), DOUBLE, 1, "0");
+    //object_get((OBJECT *) vsitesparms, "c", &(vsitesparms->c), DOUBLE, 1, "0");
     object_get((OBJECT *) vsitesparms, "type", &(vsitesparms->vtypestr), STRING, 1, "NoType");
 
     if (strcmp(vsitesparms->vtypestr, "VSITE1") == 0){
@@ -177,12 +179,14 @@ VSITEPARMS *vsiteparms_init(void *parent, char *name)
     }else if(strcmp(vsitesparms->vtypestr, "VSITE2FD") == 0){
         vsitesparms->vtype=VSITE2FD;
     }else if(strcmp(vsitesparms->vtypestr, "VSITE3") == 0){
+        object_get((OBJECT *) vsitesparms, "c", &(vsitesparms->c), DOUBLE, 1, "0");
         vsitesparms->vtype=VSITE3;
     }else if(strcmp(vsitesparms->vtypestr, "VSITE3FD") == 0){
         vsitesparms->vtype=VSITE3FD;
     }else if(strcmp(vsitesparms->vtypestr, "VSITE3FAD") == 0){
         vsitesparms->vtype=VSITE3FAD;
     }else if(strcmp(vsitesparms->vtypestr, "VSITE3OUT") == 0){
+        object_get((OBJECT *) vsitesparms, "c", &(vsitesparms->c), WITH_UNITS, 1, "0.0", "Angstrom^-1", NULL);
         vsitesparms->vtype=VSITE3OUT;
     }else if(strcmp(vsitesparms->vtypestr, "VSITE4FD") == 0){
         vsitesparms->vtype=VSITE4FD;
