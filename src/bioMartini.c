@@ -132,6 +132,7 @@ void validateExclusions(MMFF *mmff)
             }
         }
 
+
         for(int v = 0; v< resiParm->nVsite; v++)
         {
             VSITEPARMS *visteparms = resiParm->vsiteList[v];
@@ -1578,6 +1579,26 @@ void martini(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
 
     if(parms->use_vsite) {
         vsite_force(sys, parms, e);
+    }
+
+    // Update the force to ddc items
+    STATE* state = sys->collection->state;
+    SETLIST *residueSet = &parms->residueSet;
+    LISTNODE* residueList = residueSet->list;
+    STATE *statechpad = &(parms->statechpad);
+
+
+    for (int i = 0; i < residueSet->molSize; i++)
+    {
+        unsigned index = parms->gidOrder2[i].id;
+        if (index > sys->nion)
+        {
+            continue;
+        }
+        state->fx[index] = statechpad->fx[i];
+        state->fy[index] = statechpad->fy[i];
+        state->fz[index] = statechpad->fz[i];
+        //index++;
     }
 
     if (firstTime)

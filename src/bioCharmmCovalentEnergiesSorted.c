@@ -367,7 +367,7 @@ double resAngleRestrainSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal
     double eatot = 0;
     ANGLE_CONN ** rebangleList = resiConn->rebangleList;
     //DEBUG ONLY
-    int angleCount = 0;
+    //int angleCount = 0;
     for (int i = 0; i < resiConn->atomListSize; ++i)
     {
         RANGE rebangleRange = resiConn->atmRanges[i]->rebangleRange;
@@ -417,7 +417,7 @@ double resAngleRestrainSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal
             double ea = anglePtr->ktheta * aDelta*aDelta/sinAsq; // convert deg to rad
             eatot = eatot + ea;
 
-            angleCount++;
+            //angleCount++;
 
             if (ea > 0.5)
             {

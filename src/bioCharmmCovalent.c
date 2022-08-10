@@ -166,9 +166,9 @@ void charmmSetup(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
                 statechpad->rx[sp_id] = state->rx[s_id];
                 statechpad->ry[sp_id] = state->ry[s_id];
                 statechpad->rz[sp_id] = state->rz[s_id];
-                statechpad->fx[sp_id] = state->fx[s_id];
-                statechpad->fy[sp_id] = state->fy[s_id];
-                statechpad->fz[sp_id] = state->fz[s_id];
+                //statechpad->fx[sp_id] = state->fx[s_id];
+                //statechpad->fy[sp_id] = state->fy[s_id];
+                //statechpad->fz[sp_id] = state->fz[s_id];
                 statechpad->species[sp_id] = state->species[s_id];
                 parms->gidOrder2[sp_id].id = gidOrder[index].id;
                 index++;
@@ -218,24 +218,47 @@ void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
     LISTNODE* residueList = residueSet->list;
     STATE *statechpad = &(parms->statechpad);
 
+    GID_ORDER *gidOrder = parms->gidOrder;
+
     BIOENERGIES bioEnergiesZero = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     parms->bioEnergies = bioEnergiesZero;
 
-    /*
-    if(parms->use_vsite)
+    unsigned s_id = 0;
+    int sp_id = 0;
+
+    unsigned index = 0;
+    for (int i = 0; i < residueSet->listSize; i++)
     {
-        for (int i = 0; i < residueSet->listSize; i++)
+        RESI_CONN * resiConn = residueList[i].resiConn;
+        char * name = resiConn->resName;
+        char *terminus = "x";
+        if (resiConn->nTer) { terminus = "n"; }
+        if (resiConn->cTer) { terminus = "c";}
+        char atmName[11];
+        strcpy(atmName, name);
+        strcat_(atmName, terminus);
+        int len = strlen(atmName);
+        for (int j = 0; j < resiConn->atomListSize; j++)
         {
-            vsite_construction(statechpad, parms->gidOrder2, sys->nlocal, residueSet->molSize, residueList[i].name, parms->resRange2[i], parms);
+            strcpy(atmName + len, resiConn->atomList[j]->atmName);
+            s_id = gidOrder[index].id;
+            if (index < sys->nion && state->species[s_id] && (state->species[s_id]->name) &&(strcmp(atmName, state->species[s_id]->name) == 0))
+            {
+                statechpad->fx[sp_id] = state->fx[s_id];
+                statechpad->fy[sp_id] = state->fy[s_id];
+                statechpad->fz[sp_id] = state->fz[s_id];
+                index++;
+            }
+            sp_id++;
         }
     }
-     */
 
     profile(CHARMM_CONNECTIVE, START);
     for (int i = 0; i < residueSet->listSize; i++)
     {
         connectiveEnergy(statechpad, parms->gidOrder2, sys->nlocal, residueSet->molSize, residueList[i].name, &(parms->resRange2[i]), parms, e);
     }
+
     double etot = 0.0;
     etot += parms->bioEnergies.bond;
     etot += parms->bioEnergies.angle;
@@ -265,27 +288,6 @@ void charmmConvalent(SYSTEM*sys, CHARMMPOT_PARMS *parms, ETYPE *e)
 
     profile(CHARMM_CONNECTIVE, END);
 
-    // Update the force to ddc items 
-    // May not need to update coordinates.
-    // transfer state from padded sorted state array to system state array
-    //index = 0;
-    for (int i = 0; i < residueSet->molSize; i++)
-    {
-        //if (statechpad->label[i] == INT_MAX) {continue;};
-        //if (gidOrder2[i].id == INT_MAX) {continue;};
-        unsigned index = parms->gidOrder2[i].id;
-        if (index > sys->nion)
-        {
-            continue;
-        }
-        state->rx[index] = statechpad->rx[i];
-        state->ry[index] = statechpad->ry[i];
-        state->rz[index] = statechpad->rz[i];
-        state->fx[index] = statechpad->fx[i];
-        state->fy[index] = statechpad->fy[i];
-        state->fz[index] = statechpad->fz[i];
-        //index++; 
-    }
     //printf("cpu bond sum %f\n", parms->bioEnergies.bond);
     profile(CHARMM_COVALENT, END);
 
