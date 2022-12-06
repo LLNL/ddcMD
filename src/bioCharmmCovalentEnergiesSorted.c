@@ -8,6 +8,7 @@
 #include "energyInfo.h"
 #include "expandbuffer.h"
 #include "ddc.h"
+#include "ddcMath.h"
 #include "ddcMalloc.h"
 #include "bioGid.h"
 #include "preduce.h"
@@ -721,6 +722,8 @@ double resTorsionSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESR
 
 double resImproperSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RESRANGE* resRange, RESI_CONN* resiConn, ETYPE *e, BIOWEIGHTS* weights)
 {
+    double PI2=2*M_PI;
+    double PI_1=-1*M_PI;
     double eimprtot = 0;
 
     IMPR_CONN ** imprList = resiConn->imprList;
@@ -765,6 +768,11 @@ double resImproperSorted(STATE* state, GID_ORDER* gidOrder, unsigned nlocal, RES
 
             IMPROPER_PARMS* imprPtr = imprConn->imprPtr;
             double imprDelta = impr - imprPtr->psi0;
+            if(imprDelta<PI_1){
+                imprDelta=imprDelta+PI2;
+             }else if (imprDelta> M_PI){
+		imprDelta=imprDelta-PI2;
+	     }
             double eimpr = imprPtr->kpsi * imprDelta*imprDelta;
             eimprtot = eimprtot + eimpr;
             if (eimpr > 0.1)

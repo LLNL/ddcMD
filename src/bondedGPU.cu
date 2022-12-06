@@ -1,6 +1,7 @@
 #include "bondedGPU.h"
 #include "cudaUtils.h"
 #include "units.h"
+#include "ddcMath.h"
 #include <thrust/pair.h>
 #include "pairProcessGPU.h"
 #include "bioCharmmParms.h"
@@ -2208,6 +2209,8 @@ __global__ void improperKernel(STATE *state, double *rx, double *ry, double *rz,
     double fpxz = 0;
     double fpyz = 0;
     double eimprtot = 0;
+    double PI2=2*M_PI;
+    double PI_1=-1*M_PI;
     //double eimpr =0;
     for (int bi = improper_start_idx; bi < improper_end_idx; bi++)
     {
@@ -2245,6 +2248,11 @@ __global__ void improperKernel(STATE *state, double *rx, double *ry, double *rz,
         double psi0 = psi0_[bi];
         double kpsi = kpsi_[bi];
         double imprDelta = impr - psi0;
+        if(imprDelta<PI_1){
+            imprDelta=imprDelta+PI2;
+        }else if (imprDelta> M_PI){
+            imprDelta=imprDelta-PI2;
+        }
 
         //double imprDelta=impr-imprPtr->psi0/RAD2DEG;
         double eimpr = kpsi * imprDelta*imprDelta;

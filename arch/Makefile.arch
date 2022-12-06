@@ -15,6 +15,9 @@ endif
 ifeq ($(HOSTNAME), quartz)
   ARCHGUESS = toss3
 endif
+ifeq ($(HOSTNAME), ruby)
+  ARCHGUESS = toss3
+endif
 ifeq ($(HOSTNAME), surface)
   ARCHGUESS = toss3
 endif
