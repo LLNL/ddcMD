@@ -6,6 +6,9 @@ endif
 ifeq ($(HOSTNAME),kras)
   ARCHGUESS = apple
 endif
+ifeq ($(HOSTNAME),vina)
+  ARCHGUESS = applebrew
+endif
 ifeq ($(HOSTNAME),Rohan)
   ARCHGUESS = macosx
 endif

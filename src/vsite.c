@@ -776,33 +776,21 @@ void force_vsite4fdn(STATE* state, VSITE_CONN *vsiteConn, int index1, int index2
     THREE_VECTOR rt = cross(&rjcom, &rab);
     VSCALE(rt, 1/rjcomsq);
 
-    THREE_VECTOR f3;
-    f3.x = (-rjcom.x * rt.x) * fcom.x + (rab.z - rjcom.y * rt.x) * fcom.y + (-rab.y - rjcom.z * rt.x) * fcom.z;
-    f3.y = (-rab.z - rjcom.x * rt.y) * fcom.x + (-rjcom.y * rt.y) * fcom.y + (rab.x - rjcom.z * rt.y) * fcom.z;
-    f3.z = (rab.y - rjcom.x * rt.z) * fcom.x + (-rab.x -rjcom.y * rt.z) * fcom.y + (-rjcom.z * rt.z) * fcom.z;
+    THREE_VECTOR fj;
+    fj.x = (-rjcom.x * rt.x) * fcom.x + (rab.z - rjcom.y * rt.x) * fcom.y + (-rab.y - rjcom.z * rt.x) * fcom.z;
+    fj.y = (-rab.z - rjcom.x * rt.y) * fcom.x + (-rjcom.y * rt.y) * fcom.y + (rab.x - rjcom.z * rt.y) * fcom.z;
+    fj.z = (rab.y - rjcom.x * rt.z) * fcom.x + (-rab.x -rjcom.y * rt.z) * fcom.y + (-rjcom.z * rt.z) * fcom.z;
 
     rt = cross(&rjb, &rjcom);
     VSCALE(rt, a/rjcomsq);
-    THREE_VECTOR f4;
-    f4.x = (-rjcom.x * rt.x) * fcom.x + (-a * rjb.z -rjcom.y * rt.x) * fcom.y + (a * rjb.y - rjcom.z * rt.z) * fcom.z;
-    f4.y = (a * rjb.z - rjcom.x * rt.y) * fcom.x + (-rjcom.y * rt.y) * fcom.y + (-a * rjb.x - rjcom.z * rt.y) * fcom.z;
-    f4.z = (-a * rjb.y - rjcom.x * rt.z) * fcom.x + (a * rjb.x - rjcom.x * rt.z) * fcom.y + (-rjcom.z * rt.z) * fcom.z;
+    THREE_VECTOR fk;
+    fk.x = (-rjcom.x * rt.x) * fcom.x + (-a * rjb.z -rjcom.y * rt.x) * fcom.y + (a * rjb.y - rjcom.z * rt.z) * fcom.z;
+    fk.y = (a * rjb.z - rjcom.x * rt.y) * fcom.x + (-rjcom.y * rt.y) * fcom.y + (-a * rjb.x - rjcom.z * rt.y) * fcom.z;
+    fk.z = (-a * rjb.y - rjcom.x * rt.z) * fcom.x + (a * rjb.x - rjcom.x * rt.z) * fcom.y + (-rjcom.z * rt.z) * fcom.z;
 
     rt = cross(&rjcom, &rja);
     VSCALE(rt, b/rjcomsq);
-    THREE_VECTOR f5;
-    f5.x = (-rjcom.x * rt.x) * fcom.x + (b * rja.z - rjcom.y * rt.x) * fcom.y + (-b * rja.y - rjcom.z * rt.x) * fcom.z;
-    f5.y = (-b * rja.z - rjcom.x * rt.y) * fcom.x + (-rjcom.y * rt.y) * fcom.y + (b * rja.x - rjcom.z * rt.y) * fcom.z;
-    f5.y = (b * rja.y - rjcom.x * rt.z) * fcom.x + (-b * rja.x - rjcom.y * rt.z) * fcom.y + (-rjcom.z * rt.z) * fcom.z;
 
-    THREE_VECTOR f2com1 = vector_sub(f1, f3);
-    THREE_VECTOR f2com2 = vector_sub(f2com1, f4);
-    THREE_VECTOR f2com  = vector_sub(f2com2, f5);
-    accufVec(state, index2, f2com);
-
-    accufVec(state, index3, f3);
-    accufVec(state, index4, f4);
-    accufVec(state, index5, f5);
 }
 
 void force_vsiten(STATE* state, VSITE_CONN *vsiteConn, int index1, int index2, int index3, int index4, int index5)

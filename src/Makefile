@@ -162,7 +162,7 @@ gpuSRC       = minMaxGPU.cu pairProcessGPU.cu radix_sort.cu gpuMemUtils.cu prefi
 bioSRC       = bioCharmmTop.c bioCharmmPar.c bioString.c bioCharmmParms.c bioCharmm.c\
                bioCharmmCovalent.c bioCharmmCovalentEnergies.c  bioCharmmCovalentEnergiesNormal.c\
                bioCharmmCovalentEnergiesSorted.c bioCharmmCovalentEnergiesSortedWeighted.c \
-               bioTransform.c bioCharmmRule.c bioMartini.c bioMartiniRule.c bioMMFF.c restraint.c
+               bioTransform.c bioCharmmRule.c bioMartini.c bioMartiniRule.c bioMMFF.c restraint.c vsite.c
 
 cdbSRC       = 
 
